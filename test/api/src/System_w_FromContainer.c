@@ -16,11 +16,11 @@ void Iter(ecs_iter_t *it) {
     Position *p = NULL;
     Velocity *v = NULL;
 
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         p = ecs_term(it, Position, 2);
     }
 
-    if (it->column_count >= 3) {
+    if (it->term_count >= 3) {
         v = ecs_term(it, Velocity, 3);
     }
 
@@ -66,7 +66,7 @@ void System_w_FromContainer_1_column_from_container() {
     ecs_add_pair(world, e3, EcsChildOf, parent);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -122,7 +122,7 @@ void System_w_FromContainer_2_column_1_from_container() {
     ecs_add_pair(world, e3, EcsChildOf, parent);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -183,15 +183,15 @@ void Iter_2_shared(ecs_iter_t *it) {
     Position *p = NULL;
     Velocity *v = NULL;
 
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         r_ptr = ecs_term(it, Rotation, 2);
     }
 
-    if (it->column_count >= 3) {
+    if (it->term_count >= 3) {
         p = ecs_term(it, Position, 3);
     }
 
-    if (it->column_count >= 4) {
+    if (it->term_count >= 4) {
         v = ecs_term(it, Velocity, 4);
     }    
 
@@ -243,7 +243,7 @@ void System_w_FromContainer_3_column_2_from_container() {
     ecs_add_pair(world, e4, EcsChildOf, parent);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -314,7 +314,7 @@ void System_w_FromContainer_3_column_2_from_different_container() {
     ecs_add_pair(world, e5, EcsChildOf, parent_2);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -376,7 +376,7 @@ void System_w_FromContainer_2_column_1_from_container_w_not() {
     ecs_add_pair(world, e4, EcsChildOf, parent_1);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -450,7 +450,7 @@ void System_w_FromContainer_3_column_1_from_comtainer_1_from_container_w_not() {
     ecs_add_pair(world, e5, EcsChildOf, parent_3);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -509,7 +509,7 @@ void System_w_FromContainer_2_column_1_from_container_w_not_prefab() {
     ecs_set(world, e1, Position, {1, 2});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -569,7 +569,7 @@ void System_w_FromContainer_2_column_1_from_container_w_or() {
     ecs_add_pair(world, e5, EcsChildOf, parent_3);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -664,7 +664,7 @@ void System_w_FromContainer_add_component_after_match() {
     ecs_set(world, parent, Mass, {2});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -712,7 +712,7 @@ void System_w_FromContainer_add_component_after_match_and_rematch() {
     ecs_add_pair(world, e2, EcsChildOf, parent);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* This will rematch tables, but not match Iter with e1 and e2 because the
      * parent does not have Mass yet */
@@ -767,7 +767,7 @@ void System_w_FromContainer_add_component_after_match_and_rematch_w_entity_type_
     ECS_ENTITY(world, e2, Position, CHILDOF | Parent);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* This will rematch tables, but not match Iter with e1 and e2 because the
      * Parent does not have Mass yet */
@@ -834,7 +834,7 @@ void System_w_FromContainer_add_component_after_match_and_rematch_w_entity_type_
     ECS_ENTITY(world, e2, Position, CHILDOF | Parent);  
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* This will rematch tables, but not match Iter with e1 and e2 because the
      * Parent does not have Mass yet */
@@ -890,7 +890,7 @@ void System_w_FromContainer_add_component_after_match_unmatch() {
     ecs_set(world, parent, Mass, {2});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -933,7 +933,7 @@ void System_w_FromContainer_add_component_after_match_unmatch_match() {
     ecs_set(world, parent, Mass, {2});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -983,7 +983,7 @@ void System_w_FromContainer_add_component_after_match_2_systems() {
     ecs_set(world, parent, Mass, {2});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -1052,7 +1052,7 @@ void System_w_FromContainer_add_component_in_progress_after_match() {
     ecs_add_id(world, parent, Tag);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -1101,7 +1101,7 @@ void System_w_FromContainer_adopt_after_match() {
     ecs_set(world, parent, Mass, {2});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -1148,7 +1148,7 @@ void System_w_FromContainer_new_child_after_match() {
     ecs_set(world, parent, Mass, {2});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -1216,7 +1216,7 @@ void System_w_FromContainer_select_same_from_container() {
     ecs_set(world, e3, Position, {30, 60});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -1266,7 +1266,7 @@ void System_w_FromContainer_realloc_after_match() {
     ecs_add_pair(world, e1, EcsChildOf, parent);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 

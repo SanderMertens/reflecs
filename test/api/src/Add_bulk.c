@@ -455,7 +455,7 @@ void Add_bulk_on_add() {
     ECS_TRIGGER(world, AddVelocity, EcsOnAdd, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new(world, Position, 10);
     test_assert(ids != NULL);
@@ -569,7 +569,7 @@ void Add_bulk_add_entity_on_add() {
     ECS_TRIGGER(world, AddVelocity, EcsOnAdd, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new(world, Position, 10);
     test_assert(ids != NULL);

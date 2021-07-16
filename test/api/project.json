@@ -529,7 +529,9 @@
                 "has_entity_0_component",
                 "has_entity_owned",
                 "has_entity_owned_0",
-                "has_entity_owned_0_component"
+                "has_entity_owned_0_component",
+                "has_wildcard",
+                "has_wildcard_pair"
             ]
         }, {
             "id": "Count",

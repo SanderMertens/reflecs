@@ -67,6 +67,12 @@ extern "C" {
  * @{
  */
 
+/** An object. An object can be anything that the API creates and returns as a
+ * pointer. The validity of objects is checked at runtime. The object 
+ * abstraction is used to implement common functionality (mixins) once, with
+ * additional benefits such as runtime object inspection. */
+typedef void ecs_object_t;
+
 /** An id. Ids are the things that can be added to an entity. An id can be an
  * entity or pair, and can have an optional role. */
 typedef uint64_t ecs_id_t;
@@ -91,6 +97,9 @@ typedef struct ecs_trigger_t ecs_trigger_t;
 
 /** An observer reacts to events matching multiple filter terms */
 typedef struct ecs_observer_t ecs_observer_t;
+
+/** An observable contains lists of triggers for specific events/components */
+typedef struct ecs_observable_t ecs_observable_t;
 
 /* An iterator lets an application iterate entities across tables. */
 typedef struct ecs_iter_t ecs_iter_t;
@@ -127,6 +136,11 @@ typedef struct ecs_ref_t ecs_ref_t;
 /** Action callback for systems and triggers */
 typedef void (*ecs_iter_action_t)(
     ecs_iter_t *it);
+
+typedef void (*ecs_iter_create_action_t)(
+    ecs_object_t *iterable, 
+    ecs_iter_t *it,
+    ecs_id_t filter);
 
 typedef bool (*ecs_iter_next_action_t)(
     ecs_iter_t *it);  
@@ -264,11 +278,14 @@ typedef enum ecs_match_kind_t {
 struct ecs_filter_t {
     ecs_term_t *terms;         /* Array containing terms for filter */
     int32_t term_count;        /* Number of elements in terms array */
-
     int32_t term_count_actual; /* Processed count, which folds OR terms */
     
     char *name;                /* Name of filter (optional) */
     char *expr;                /* Expression of filter (if provided) */
+
+    bool match_this;           /* True if filter has terms with This subjects */
+    bool match_only_this;      /* True if filter only has terms with This 
+                                * subjects without substitution */
 
     /* Deprecated fields */
     ecs_type_t include;
@@ -286,18 +303,21 @@ struct ecs_trigger_t {
     ecs_entity_t events[ECS_TRIGGER_DESC_EVENT_COUNT_MAX];
     int32_t event_count;
 
-    ecs_iter_action_t action;   /* Callback */
+    ecs_iter_action_t action;      /* Callback */
 
-    void *ctx;                  /* Callback context */
-    void *binding_ctx;          /* Binding context (for language bindings) */
+    void *ctx;                     /* Callback context */
+    void *binding_ctx;             /* Binding context (for language bindings) */
 
-    ecs_ctx_free_t ctx_free;    /* Callback to free ctx */
+    ecs_ctx_free_t ctx_free;       /* Callback to free ctx */
     ecs_ctx_free_t binding_ctx_free; /* Callback to free binding_ctx */
     
-    ecs_entity_t entity;        /* Trigger entity */
-    ecs_entity_t self;          /* Entity associated with observer */
+    ecs_entity_t entity;           /* Trigger entity */
+    ecs_entity_t self;             /* Entity associated with trigger */
+    ecs_observable_t *observable;  /* Observable for trigger */
 
-    uint64_t id;                /* Internal id */
+    bool retrigger;                /* Retrigger for past events */
+
+    uint64_t id;                   /* Internal id */
 };
 
 
@@ -312,18 +332,19 @@ struct ecs_observer_t {
     ecs_entity_t events[ECS_TRIGGER_DESC_EVENT_COUNT_MAX];
     int32_t event_count;   
     
-    ecs_iter_action_t action;   /* Callback */
+    ecs_iter_action_t action;      /* Callback */
 
-    void *ctx;                  /* Callback context */
-    void *binding_ctx;          /* Binding context (for language bindings) */
+    void *ctx;                     /* Callback context */
+    void *binding_ctx;             /* Binding context (for language bindings) */
 
-    ecs_ctx_free_t ctx_free;    /* Callback to free ctx */
+    ecs_ctx_free_t ctx_free;       /* Callback to free ctx */
     ecs_ctx_free_t binding_ctx_free; /* Callback to free binding_ctx */
     
-    ecs_entity_t entity;        /* Observer entity */
-    ecs_entity_t self;          /* Entity associated with observer */
+    ecs_entity_t entity;           /* Observer entity */
+    ecs_entity_t self;             /* Entity associated with observer */
+    ecs_observable_t *observable;  /* Observable for trigger */
 
-    uint64_t id;                /* Internal id */    
+    uint64_t id;                   /* Internal id */    
 };
 
 /** @} */
@@ -448,13 +469,8 @@ typedef struct ecs_query_desc_t {
     /* Function to free group_by_ctx */
     ecs_ctx_free_t group_by_ctx_free;
 
-    /* If set, the query will be created as a subquery. A subquery matches at
-     * most a subset of its parent query. Subqueries do not directly receive
-     * (table) notifications from the world. Instead parent queries forward
-     * results to subqueries. This can improve matching performance, as fewer
-     * queries need to be matched with new tables.
-     * Subqueries can be nested. */
-    ecs_query_t *parent;
+    /* Query parent (must be either world or query) */
+    ecs_object_t *parent;
 
     /* INTERNAL PROPERTY - system to be associated with query. Do not set, as 
      * this will change in future versions. */
@@ -474,11 +490,15 @@ typedef struct ecs_trigger_desc_t {
      * the term field is ignored. */
     const char *expr;
 
-    /* Events to trigger on (OnAdd, OnRemove, OnSet, UnSet) */
+    /* Events to trigger on */
     ecs_entity_t events[ECS_TRIGGER_DESC_EVENT_COUNT_MAX];
 
     /* Callback to invoke on an event */
     ecs_iter_action_t callback;
+
+    /* Trigger on events that occurred prior to creation of trigger. Only 
+     * supported for events with the Iterable component. */
+    bool retrigger;
 
     /* Associate with entity */
     ecs_entity_t self;
@@ -494,6 +514,9 @@ typedef struct ecs_trigger_desc_t {
 
     /* Callback to free binding_ctx */     
     ecs_ctx_free_t binding_ctx_free;
+
+    /* Observable with which to register the trigger */
+    ecs_object_t *observable;
 } ecs_trigger_desc_t;
 
 
@@ -524,7 +547,10 @@ typedef struct ecs_observer_desc_t {
     ecs_ctx_free_t ctx_free;
 
     /* Callback to free binding_ctx */     
-    ecs_ctx_free_t binding_ctx_free;    
+    ecs_ctx_free_t binding_ctx_free; 
+
+    /* Observable with which to register the observer */
+    ecs_object_t *observable;       
 } ecs_observer_desc_t;
 
 /** @} */
@@ -594,6 +620,9 @@ typedef struct EcsQuery {
     ecs_query_t *query;
 } EcsQuery;
 
+/** Component for iterable entities */
+typedef ecs_iterable_t EcsIterable;
+
 /** @} */
 
 
@@ -601,6 +630,143 @@ typedef struct EcsQuery {
  * @defgroup misc_types Miscalleneous types
  * @{
  */
+
+/** Iterator.
+ * Contains all data necessary to iterate entities and component data. Iterators
+ * can be used without knowledge about the components being iterated. This makes 
+ * it possible for code like serializers and language bindings to inspect them.
+ *
+ * Each iterable object in flecs has an "iter" and a "next" function that are 
+ * used to obtain an iterator and iterate through the results. For example:
+ *
+ *   ecs_query_t *q = ...;
+ *  
+ *   // Create iterator
+ *   ecs_iter_t it = ecs_query_iter(q);
+ *  
+ *   // Iterate results
+ *   while (ecs_query_next(&it)) { }
+ *
+ * For each time the "next" function returns true, there are "count" entities to
+ * iterate, with the entity ids stored in the "entities" array:
+ *
+ *   while (ecs_query_next(&it)) { 
+ *     for (int i = 0; i < it.count; i ++) {
+ *       printf("entity matched: %u\n", it.entities[i]);
+ *     }
+ *   }
+ *
+ *
+ * It is guaranteed that each entity returned by a single "next" call has the
+ * same components. The type of the current batch of entities is accessible
+ * through the "type" member.
+ *
+ * Component data is accessible through the "columns" member which contains an
+ * array where each element stores the component data for a query term. For
+ * example, the following expression accesses a component value for the 2nd 
+ * term, 10th entity of type "Position": ((Position*)it.columns[1])[9];
+ *
+ * For convenience and safety checking applications should use ecs_term():
+ *
+ *   Position *p = ecs_term(&it, Position, 2);
+ * 
+ * Note that the term is here provided as 2. This is because ecs_term starts
+ * counting from 1 (the reason for this is that previous versions of Flecs
+ * stored entity ids as a component array at index 0).
+ *
+ * This shows a typical example of iterating two components:
+ *
+ *   while (ecs_query_next(&it)) { 
+ *     Position *p = ecs_term(&it, Position, 1);
+ *     Velocity *v = ecs_term(&it, Velocity, 2);
+ *  
+ *     for (int i = 0; i < it.count; i ++) {
+ *       p[i].x += v[i].x;
+ *       p[i].y += v[i].y;
+ *     }
+ *   }
+ *
+ * The above applies to any term that has a "This" subject, where a subject is
+ * the entity on which the component is matched, and "This" is the entity being
+ * matched by the query. This query has both "This" and non-"This" terms:
+ *
+ *   Position, Velocity(This), MaxSpeed(Game)
+ * 
+ * Here only the 1st and 2nd terms are "This" terms: the subject of the 3rd term
+ * is "Game". This means "MaxSpeed" will be retrieved from the "Game" entity.
+ *
+ * When a term contains data from a non-"This" term, it is not accessed as an
+ * array but as a pointer (or as an array with a single element), as this
+ * example shows:
+ *
+ *   while (ecs_query_next(&it)) { 
+ *     Position *p = ecs_term(&it, Position, 1);
+ *     Velocity *v = ecs_term(&it, Velocity, 2);
+ *     MaxSpeed *s = ecs_term(&it, MaxSpeed, 3);
+ *  
+ *     for (int i = 0; i < it.count; i ++) {
+ *       p[i].x += max(v[i].x, s->value);
+ *       p[i].y += max(v[i].y, s->value);
+ *     }
+ *   }
+ *
+ * Other examples of non-"This" terms are terms with substitutions, or 
+ * singletons. The following examples are all non-"This" terms:
+ *
+ *   $Position
+ *   Position(Game)
+ *   Position(superset)
+ *   Likes(Alice, *)
+ */
+struct ecs_iter_t {
+    ecs_entity_t *entities;  /* Entity ids for current table. Size: count */
+    int32_t count;           /* Number of entities to iterate for current table */
+    int32_t offset;          /* Offset from where to start iterating */
+    void **columns;          /* Component data. Size: term_count_actual */
+    int32_t *type_map;       /* Maps terms to indices in the type. Size: term_count_actual */
+
+    ecs_table_t *table;      /* Table being evaluated */
+    ecs_type_t type;         /* Type of entity/entities being evaluated */
+    ecs_term_t *terms;       /* Terms of current query. Size: term_count */
+
+    ecs_id_t *ids;           /* Component ids. Size: term_count_actual */
+    ecs_entity_t *subjects;  /* Subjects of terms, 0 for "This" terms. Size: term_count_actual */
+    ecs_size_t *sizes;       /* Component sizes. Size: term_count_actual */
+    ecs_type_t *types;       /* Components as types. Size: term_count_actual */
+
+    ecs_world_t *world;      /* The world. May point to a stage when in readonly mode. */
+    ecs_world_t *real_world; /* Always points to the actual world. */
+
+    int32_t term_count;      /* Number of elements in the terms array */
+    int32_t term_count_actual; /* Number of elements in the result arrays. This
+                                * number differs from term_count when the query
+                                * contains Or terms, as multiple Or terms get
+                                * folded into a single result term. */
+    int32_t term_index;      /* Index of term that triggered an event.
+                              * This field will be set to the 'index' field
+                              * of a trigger/observer term. */    
+
+    ecs_entity_t system;     /* The system, trigger or observer */
+    ecs_entity_t event;      /* The triggering event, if applicable */
+    ecs_id_t event_id;       /* The (component) id for the event */
+    ecs_entity_t self;       /* Self entity, if set */
+
+    void *param;             /* Param passed to ecs_run */
+    void *ctx;               /* System/trigger/observer context */
+    void *binding_ctx;       /* Binding context (for language bindings) */
+    void *iter_ctx;          /* Iterator context (for custom iterators) */
+
+    FLECS_FLOAT delta_time;        /* Time elapsed since last frame */
+    FLECS_FLOAT delta_system_time; /* Time elapsed since last system invocation */
+    FLECS_FLOAT world_time;        /* Time elapsed since start of simulation */
+
+    int32_t frame_offset;
+    int32_t table_count;
+
+    ecs_entity_t interrupted_by;  /* When set, system execution is interrupted */
+
+    ecs_iter_private_t private;   /* Private iterator data */
+};
 
 /** Type that contains information about the world. */
 typedef struct ecs_world_info_t {
@@ -744,37 +910,52 @@ FLECS_API extern const ecs_entity_t EcsDisabled;
  * code. The tag has no functional implications. */
 FLECS_API extern const ecs_entity_t EcsHidden;
 
-/* Used to create triggers that subscribe on add events */
+/* Event. Triggers when an id (component, tag, pair) is added to an entity */
 FLECS_API extern const ecs_entity_t EcsOnAdd;
 
-/* Used to create triggers that subscribe on remove events */
+/* Event. Triggers when an id (component, tag, pair) is removed from an entity */
 FLECS_API extern const ecs_entity_t EcsOnRemove;
 
-/* Used to create systems that subscribe on set events */
+/* Event. Triggers when a component is set for an entity */
 FLECS_API extern const ecs_entity_t EcsOnSet;
 
-/* Used to create systems that subscribe on unset events */
+/* Event. Triggers when a component is unset for an entity */
 FLECS_API extern const ecs_entity_t EcsUnSet;
 
-/* Relationship used to define what should happen when an entity is deleted that
- * is added to other entities. For example, if an entity is used as a tag, and
- * this entity is deleted, this would leave dangling references (ids) to this
- * entity in the storage.
- * This relation, when combined with EcsRemove, EcsDelete or EcsThrow, can be
- * used to customize the deletion behavior. For example:
- *   ecs_add_pair(world, Position, EcsOnDelete, EcsThrow);
- *
- * This would throw an error when attempting to delete Position, if Position is
- * added to any entities at the time of deletion. */
+/* Event. Triggers when an entity is deleted.
+ * Also used as relation for defining cleanup behavior, see: 
+ * https://github.com/SanderMertens/flecs/blob/master/docs/Relations.md#relation-cleanup-properties
+ */
 FLECS_API extern const ecs_entity_t EcsOnDelete;
 
-/* Relationship with similar functionality to EcsDelete, except that it allows
- * for specifying behavior when an object of a relation is removed. For example:
- *   ecs_add_pair(world, EcsChildOf, EcsOnDeleteObject, EcsDelete);
- *
- * This specifies that whenever an object of a ChildOf relation (the parent) is 
- * removed, the entities with a relation to that object (the children) should be
- * deleted. */
+/* Event. Triggers when a table is created. */
+FLECS_API extern const ecs_entity_t EcsOnCreateTable;
+
+/* Event. Triggers when a table is deleted. */
+FLECS_API extern const ecs_entity_t EcsOnDeleteTable;
+
+/* Event. Triggers when a table becomes empty (doesn't trigger on creation). */
+FLECS_API extern const ecs_entity_t EcsOnTableEmpty;
+
+/* Event. Triggers when a table becomes non-empty. */
+FLECS_API extern const ecs_entity_t EcsOnTableNonEmpty;
+
+/* Event. Triggers when a trigger is created. */
+FLECS_API extern const ecs_entity_t EcsOnCreateTrigger;
+
+/* Event. Triggers when a trigger is deleted. */
+FLECS_API extern const ecs_entity_t EcsOnDeleteTrigger;
+
+/* Event. Triggers when observable is deleted. */
+FLECS_API extern const ecs_entity_t EcsOnDeleteObservable;
+
+/* Event. Triggers when lifecycle methods for a component are registered */
+FLECS_API extern const ecs_entity_t EcsOnComponentLifecycle;
+
+/* Relationship used to define what should happen when an entity is deleted that
+ * is added to other entities. For details see: 
+ * https://github.com/SanderMertens/flecs/blob/master/docs/Relations.md#relation-cleanup-properties
+ */
 FLECS_API extern const ecs_entity_t EcsOnDeleteObject;
 
 /* Specifies that a component/relation/object of relation should be removed when
@@ -979,6 +1160,69 @@ FLECS_API extern const ecs_entity_t EcsPostFrame;
 /** @} */
 
 /**
+ * @defgroup objects Object API
+ * @brief All pointers created by the API are flecs objects. These functions
+ *        obtain generic properties (mixins) from a flecs object. Not all mixins
+ *        are available for every object. When a mixin is not available, a
+ *        runtime error will be thrown.
+ * @{
+ */
+
+/** Get world from object.
+ * @param object An object.
+ * @return The world.
+ */
+FLECS_API
+const ecs_world_t* ecs_get_world(
+    const ecs_object_t *world);
+
+/** Set context.
+ * This operation allows an application to register custom data with an object.
+ *
+ * @param object The object.
+ * @param ctx A pointer to a user defined value.
+ */
+FLECS_API
+void ecs_set_ctx(
+    ecs_object_t *object,
+    void *ctx);
+
+/** Get context.
+ * This operation retrieves a previously set context from an object.
+ *
+ * @param object The object.
+ * @return The context set with ecs_set_ctx. If no context was set, the
+ *         function returns NULL.
+ */
+FLECS_API
+void* ecs_get_ctx(
+    const ecs_object_t *object);
+
+/** Set binding context.
+ * Same as ecs_set_ctx but for context required by language bindings.
+ *
+ * @param object The object.
+ * @param ctx A pointer to a user defined value.
+ */
+FLECS_API
+void ecs_set_binding_ctx(
+    ecs_object_t *object,
+    void *ctx);
+
+/** Get binding context.
+ * Same as ecs_get_ctx but for context required by language bindings.
+ *
+ * @param object The object.
+ * @return The context set with ecs_set_binding_ctx. If no context was set, the
+ *         function returns NULL.
+ */
+FLECS_API
+void* ecs_get_binding_ctx(
+    const ecs_object_t *object);
+
+/** @} */
+
+/**
  * @defgroup world_api World API
  * @{
  */
@@ -1084,29 +1328,6 @@ void ecs_set_component_actions_w_id(
 #define ecs_set_component_actions(world, component, ...)\
     ecs_set_component_actions_w_id(world, ecs_id(component), &(EcsComponentLifecycle)__VA_ARGS__)
 #endif
-
-/** Set a world context.
- * This operation allows an application to register custom data with a world
- * that can be accessed anywhere where the application has the world object.
- *
- * @param world The world.
- * @param ctx A pointer to a user defined structure.
- */
-FLECS_API
-void ecs_set_context(
-    ecs_world_t *world,
-    void *ctx);
-
-/** Get the world context.
- * This operation retrieves a previously set world context.
- *
- * @param world The world.
- * @return The context set with ecs_set_context. If no context was set, the
- *         function returns NULL.
- */
-FLECS_API
-void* ecs_get_context(
-    const ecs_world_t *world);
 
 /** Get world info.
  *
@@ -2266,16 +2487,43 @@ ecs_type_t ecs_get_type(
     const ecs_world_t *world,
     ecs_entity_t entity);
 
-/** Get the typeid of an entity.
+/** Get the typeid of an id.
+ * If the provided id is regular component, the result of this operation will be
+ * the component itself. If the provided id is an entity that is not a component
+ * the operation will return 0.
+ *
+ * If the provided id is a pair, the operation will:
+ * - return the relation if it is a component, or
+ * - return the object if it is a component, or
+ * - return 0
+ *
+ * If the provided id has a role set other than ECS_PAIR, the operation will
+ * return 0.
  *
  * @param world The world.
- * @param entity The entity.
- * @return The typeid of the entity.
+ * @param id The id.
+ * @return The id of the corresponding component.
  */
 FLECS_API
 ecs_entity_t ecs_get_typeid(
     const ecs_world_t *world,
-    ecs_id_t e);
+    ecs_id_t id);
+
+/** Get the Component component of an entity.
+ * This operation behaves as the following statement:
+ *  ecs_get(world, ecs_get_type_id(world, id), EcsComponent);
+ *
+ * If the ecs_get_typeid operation would return 0 for the provided id, this
+ * operation will return NULL.
+ *
+ * @param world The world.
+ * @param entity The entity.
+ * @return A pointer to the Component component.
+ */
+FLECS_API
+const EcsComponent* ecs_get_component(
+    const ecs_world_t *world,
+    ecs_entity_t e);    
 
 /** Get the name of an entity.
  * This will return the name as specified in the EcsName component.
@@ -3229,7 +3477,7 @@ bool ecs_query_orphaned(
 
 
 /**
- * @defgroup trigger Triggers
+ * @defgroup events Events
  */
 
 /** Create trigger.
@@ -3251,40 +3499,6 @@ ecs_entity_t ecs_trigger_init(
     ecs_world_t *world,
     const ecs_trigger_desc_t *desc);
 
-/** Get trigger context.
- * This operation returns the context pointer set for the trigger. If
- * the provided entity is not a trigger, the function will return NULL.
- *
- * @param world The world.
- * @param trigger The trigger from which to obtain the context.
- * @return The context.
- */
-FLECS_API
-void* ecs_get_trigger_ctx(
-    const ecs_world_t *world,
-    ecs_entity_t trigger);
-
-/** Same as ecs_get_trigger_ctx, but for binding ctx. 
- * The binding context is a context typically used to attach any language 
- * binding specific data that is needed when invoking a callback that is 
- * implemented in another language.
- * 
- * @param world The world.
- * @param trigger The trigger from which to obtain the context.
- * @return The context.
- */
-FLECS_API
-void* ecs_get_trigger_binding_ctx(
-    const ecs_world_t *world,
-    ecs_entity_t trigger);
-
-/** @} */
-
-
-/**
- * @defgroup observer Observers
- */
-
 /** Create observer.
  * Observers are like triggers, but can subscribe for multiple terms. An 
  * observer only triggers when the source of the event meets all terms.
@@ -3299,15 +3513,47 @@ ecs_entity_t ecs_observer_init(
     ecs_world_t *world,
     const ecs_observer_desc_t *desc);
 
-FLECS_API
-void* ecs_get_observer_ctx(
-    const ecs_world_t *world,
-    ecs_entity_t observer);
+/** Initialize observable.
+ */
+void ecs_observable_init(
+    ecs_observable_t *observable);
 
-FLECS_API
-void* ecs_get_observer_binding_ctx(
-    const ecs_world_t *world,
-    ecs_entity_t observer);
+/** Deinitialize observable.
+ */
+void ecs_observable_fini(
+    ecs_observable_t *observable);
+
+typedef enum ecs_payload_kind_t {
+    EcsPayloadNone,
+    EcsPayloadEntity,
+    EcsPayloadTable
+} ecs_payload_kind_t;
+
+typedef struct ecs_event_desc_t {
+    ecs_entity_t event;
+    ecs_ids_t *ids; /* When NULL, notify for all ids in entity/table type */
+    ecs_payload_kind_t payload_kind;
+    union {
+        ecs_entity_t entity;
+        struct {
+            ecs_table_t *table;
+            int32_t offset;
+            int32_t count; /* When 0 notify all entities starting from offset */
+        } table;
+    } payload;
+
+    void *param; /* Assigned to iter param member */
+
+    /* Observable for which to notify the triggers/observers. If NULL, the
+     * world will be used as observable. */
+    ecs_object_t *observable;
+} ecs_event_desc_t;
+
+/** Send event.
+ */
+void ecs_emit( 
+    ecs_world_t *world,
+    ecs_event_desc_t *desc);
 
 /** @} */
 
@@ -3378,7 +3624,7 @@ ecs_id_t ecs_term_id(
  * @return The source associated with te term.
  */
 FLECS_API
-ecs_entity_t ecs_term_source(
+ecs_entity_t ecs_term_subject(
     const ecs_iter_t *it,
     int32_t index);
 
@@ -3720,14 +3966,6 @@ FLECS_API
 ecs_world_t* ecs_get_stage(
     const ecs_world_t *world,
     int32_t stage_id);
-
-/** Get actual world from world.
- * @param world A pointer to a stage or the world.
- * @return The world.
- */
-FLECS_API
-const ecs_world_t* ecs_get_world(
-    const ecs_world_t *world);
 
 /** Test whether the current world object is readonly.
  * This function allows the code to test whether the currently used world object

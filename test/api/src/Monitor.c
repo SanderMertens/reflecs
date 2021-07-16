@@ -13,7 +13,7 @@ void Monitor_1_comp() {
     ECS_SYSTEM(world, OnPosition, EcsMonitor, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 1);
@@ -45,7 +45,7 @@ void Monitor_2_comps() {
     ECS_SYSTEM(world, OnPosition, EcsMonitor, Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -92,7 +92,7 @@ void Monitor_1_comp_1_not() {
     ECS_SYSTEM(world, OnPosition, EcsMonitor, Position, !Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 1);
@@ -136,7 +136,7 @@ void Monitor_1_parent() {
     ECS_SYSTEM(world, OnPosition, EcsMonitor, PARENT:Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t parent = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -166,7 +166,7 @@ void Monitor_1_comp_1_parent() {
     ECS_SYSTEM(world, OnPosition, EcsMonitor, Position, PARENT:Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t parent = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -222,7 +222,7 @@ void Monitor_1_comp_prefab_new() {
     ECS_SYSTEM(world, OnPosition, EcsMonitor, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ECS_PREFAB(world, Prefab, Position);
 
@@ -245,7 +245,7 @@ void Monitor_1_comp_prefab_add() {
     ECS_SYSTEM(world, OnPosition, EcsMonitor, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new_w_entity(world, EcsPrefab);
     ecs_add(world, e, Position);

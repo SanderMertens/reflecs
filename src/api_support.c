@@ -261,7 +261,7 @@ ecs_table_t* ecs_table_from_str(
     ecs_world_t *world,
     const char *expr)
 {
-    ecs_assert(world->magic == ECS_WORLD_MAGIC, ECS_INVALID_OPERATION, NULL);
+    ecs_object_assert(world, ecs_world_t);
 
     ecs_vector_t *ids = expr_to_ids(world, NULL, expr);
     if (!ids) {

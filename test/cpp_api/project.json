@@ -144,7 +144,26 @@
                 "entity_view_null_entity_w_world",
                 "entity_view_null_entity_w_0",
                 "entity_view_null_entity_w_world_w_0",
-                "is_wildcard"
+                "is_wildcard",
+                "has_id_t",
+                "has_pair_id_t",
+                "has_pair_id_t_w_type",
+                "has_id",
+                "has_pair_id",
+                "has_pair_id_w_type",
+                "has_wildcard_id",
+                "has_wildcard_pair_id",
+                "owns_id_t",
+                "owns_pair_id_t",
+                "owns_pair_id_t_w_type",
+                "owns_id",
+                "owns_pair_id",
+                "owns_pair_id_w_type",
+                "owns_wildcard_id",
+                "owns_wildcard_pair",
+                "id_from_world",
+                "id_pair_from_world",
+                "id_default_from_world"
             ]
         }, {
             "id": "Pairs",

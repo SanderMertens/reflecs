@@ -105,7 +105,7 @@ void Add_in_progress(ecs_iter_t *it) {
 
     ecs_type_t ecs_type(Velocity) = NULL;
 
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         ecs_type(Velocity) = ecs_column_type(it, 2);
     }
 

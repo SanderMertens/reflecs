@@ -7,11 +7,11 @@ void Iter(ecs_iter_t *it) {
     Position *p = NULL;
     Velocity *v = NULL;
 
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         p = ecs_term(it, Position, 2);
     }
 
-    if (it->column_count >= 3) {
+    if (it->term_count >= 3) {
         v = ecs_term(it, Velocity, 3);
     }
 
@@ -50,7 +50,7 @@ void System_w_FromEntity_2_column_1_from_entity() {
     ecs_set(world, e1, Mass, {5});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -89,7 +89,7 @@ static
 void Dummy(ecs_iter_t *it) {
     dummy_invoked = 1;
     dummy_component = ecs_term_id(it, 1);
-    dummy_source = ecs_term_source(it, 1);
+    dummy_source = ecs_term_subject(it, 1);
 }
 
 void System_w_FromEntity_task_from_entity() {

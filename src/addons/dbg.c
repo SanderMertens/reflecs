@@ -24,7 +24,6 @@ void ecs_dbg_table(
     *dbg_out = (ecs_dbg_table_t){.table = table};
 
     dbg_out->type = table->type;
-    dbg_out->systems_matched = table->queries;
 
     /* Determine components from parent/base entities */
     ecs_entity_t *entities = ecs_vector_first(table->type, ecs_entity_t);
@@ -99,7 +98,7 @@ ecs_table_t* ecs_dbg_get_table(
         return NULL;
     }
 
-    return ecs_sparse_get(
+    return ecs_sparse_get_dense(
         world->store.tables, ecs_table_t, index);
 }
 

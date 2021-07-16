@@ -14,13 +14,13 @@ void probe_system_w_ctx(
     ctx->event = it->event;
     ctx->event_id = it->event_id;
     ctx->offset = 0;
-    ctx->column_count = it->column_count;
+    ctx->column_count = it->term_count;
     ctx->term_index = it->term_index;
 
     int i;
     for (i = 0; i < ctx->column_count; i ++) {
-        ctx->c[ctx->invoked][i] = it->table->components[i];
-        ctx->s[ctx->invoked][i] = ecs_term_source(it, i + 1);
+        ctx->c[ctx->invoked][i] = it->ids[i];
+        ctx->s[ctx->invoked][i] = ecs_term_subject(it, i + 1);
 
         /* Make sure ecs_term functions work */
         ecs_type_t t = ecs_column_type(it, i + 1);
@@ -56,7 +56,7 @@ void probe_system_w_ctx(
 void probe_system(
     ecs_iter_t *it) 
 {
-    Probe *ctx = ecs_get_context(it->world);
+    Probe *ctx = ecs_get_ctx(it->world);
     probe_system_w_ctx(it, ctx);
 }
 

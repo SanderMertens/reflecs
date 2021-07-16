@@ -66,7 +66,17 @@ typedef uint64_t ecs_flags64_t;
 /* Keep unsigned integers out of the codebase as they do more harm than good */
 typedef int32_t ecs_size_t;
 
+/* Abstraction on top of C-style casts so that C functions can be used in C++
+ * code without generating warnings */
+#ifndef __cplusplus
+#define ECS_CAST(T, V) ((T)(V))
+#else
+#define ECS_CAST(T, V) (static_cast<T>(V))
+#endif
+
+/* Versions of sizeof and offsetof that use ecs_size_t */
 #define ECS_SIZEOF(T) ECS_CAST(ecs_size_t, sizeof(T))
+#define ECS_OFFSETOF(T, M), ECS_CAST(ecs_size_t, offsetof(T))
 
 /* Use alignof in C++, or a trick in C. */
 #ifdef __cplusplus
@@ -102,14 +112,6 @@ typedef int32_t ecs_size_t;
 /* Simple utility for determining the max of two values */
 #define ECS_MAX(a, b) ((a > b) ? a : b)
 
-/* Abstraction on top of C-style casts so that C functions can be used in C++
- * code without producing warnings */
-#ifndef __cplusplus
-#define ECS_CAST(T, V) ((T)(V))
-#else
-#define ECS_CAST(T, V) (static_cast<T>(V))
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 //// Reserved component ids
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,21 +120,22 @@ typedef int32_t ecs_size_t;
 #define FLECS__EEcsComponent (1)
 #define FLECS__EEcsComponentLifecycle (2)
 #define FLECS__EEcsType (3)
-#define FLECS__EEcsName (6)
+#define FLECS__EEcsName (4)
+#define FLECS__EEcsTrigger (5)
+#define FLECS__EEcsQuery (6)
+#define FLECS__EEcsObserver (7)
+#define FLECS__EEcsIterable (8)
 
-/** System module component ids */
-#define FLECS__EEcsTrigger (4)
-#define FLECS__EEcsObserver (11)
-#define FLECS__EEcsSystem (5)
-#define FLECS__EEcsTickSource (7)
-#define FLECS__EEcsQuery (10)
+/* System module component ids */
+#define FLECS__EEcsSystem (10)
+#define FLECS__EEcsTickSource (11)
 
 /** Pipeline module component ids */
-#define FLECS__EEcsPipelineQuery (13)
+#define FLECS__EEcsPipelineQuery (12)
 
 /** Timer module component ids */
-#define FLECS__EEcsTimer (14)
-#define FLECS__EEcsRateFilter (15)
+#define FLECS__EEcsTimer (13)
+#define FLECS__EEcsRateFilter (14)
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,9 +165,9 @@ typedef int32_t ecs_size_t;
 #define ECS_HAS_PAIR_OBJECT(e, rel, obj)\
     (ECS_HAS_RELATION(e, rel) && ECS_PAIR_OBJECT(e) == obj)
 
-#define ECS_HAS(e, type_id)(\
-    (e == type_id) ||\
-    (ECS_HAS_PAIR_OBJECT(e, ECS_PAIR_RELATION(type_id), ECS_PAIR_OBJECT(type_id))))
+#define ECS_HAS(id, has_id)(\
+    (id == has_id) ||\
+    (ECS_HAS_PAIR_OBJECT(id, ECS_PAIR_RELATION(has_id), ECS_PAIR_OBJECT(has_id))))
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -323,6 +326,7 @@ typedef int32_t ecs_size_t;
 #define ECS_MISSING_OS_API (9)
 #define ECS_THREAD_ERROR (10)
 #define ECS_CYCLE_DETECTED (11)
+#define ECS_RETRIGGER_UNSUPPORTED (12)
 
 #define ECS_INCONSISTENT_NAME (20)
 #define ECS_NAME_IN_USE (21)

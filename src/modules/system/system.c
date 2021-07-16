@@ -241,7 +241,7 @@ void ecs_enable(
     ecs_entity_t entity,
     bool enabled)
 {
-    ecs_assert(world->magic == ECS_WORLD_MAGIC, ECS_INVALID_PARAMETER, NULL);
+    ecs_object_assert(world, ecs_world_t);
 
     const EcsType *type_ptr = ecs_get( world, entity, EcsType);
     if (type_ptr) {
@@ -393,42 +393,6 @@ ecs_entity_t ecs_run(
     void *param)
 {
     return ecs_run_w_filter(world, system, delta_time, 0, 0, NULL, param);
-}
-
-void ecs_run_monitor(
-    ecs_world_t *world,
-    ecs_matched_query_t *monitor,
-    ecs_ids_t *components,
-    int32_t row,
-    int32_t count,
-    ecs_entity_t *entities)
-{
-    ecs_query_t *query = monitor->query;
-    ecs_assert(query != NULL, ECS_INTERNAL_ERROR, NULL);
-
-    ecs_entity_t system = query->system;
-    const EcsSystem *system_data = ecs_get(world, system, EcsSystem);
-    ecs_assert(system_data != NULL, ECS_INTERNAL_ERROR, NULL);
-
-    if (!system_data->action) {
-        return;
-    }
-
-    ecs_iter_t it = {0};
-    ecs_query_set_iter( world, query, &it, 
-        monitor->matched_table_index, row, count);
-
-    it.world = world;
-    it.triggered_by = components;
-    it.ctx = system_data->ctx;
-    it.binding_ctx = system_data->binding_ctx;
-
-    if (entities) {
-        it.entities = entities;
-    }
-
-    it.system = system;
-    system_data->action(&it);
 }
 
 ecs_query_t* ecs_get_system_query(
@@ -591,7 +555,7 @@ ecs_entity_t ecs_system_init(
     ecs_world_t *world,
     const ecs_system_desc_t *desc)
 {
-    ecs_assert(world->magic == ECS_WORLD_MAGIC, ECS_INVALID_FROM_WORKER, NULL);
+    ecs_object_assert(world, ecs_world_t);
     ecs_assert(!world->is_readonly, ECS_INVALID_WHILE_ITERATING, NULL);
 
     ecs_entity_t existing = desc->entity.entity;

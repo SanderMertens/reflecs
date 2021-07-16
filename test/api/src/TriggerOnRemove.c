@@ -4,7 +4,7 @@ void Deinit(ecs_iter_t *it) {
     ECS_COLUMN(it, Position, p, 1);
 
     Velocity *v = NULL;
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         v = ecs_term(it, Velocity, 2);
     }
 
@@ -25,7 +25,7 @@ void Deinit(ecs_iter_t *it) {
 
 static
 void Remove_from_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
 
     int i;
     for (i = 0; i < it->count; i ++) {
@@ -50,7 +50,7 @@ void TriggerOnRemove_remove_match_1_of_1() {
     ECS_TRIGGER(world, Deinit, EcsOnRemove, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_assert(e != 0);
@@ -79,7 +79,7 @@ void TriggerOnRemove_remove_match_1_of_2() {
     ECS_TRIGGER(world, Deinit, EcsOnRemove, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Type);
     test_assert(e != 0);
@@ -107,7 +107,7 @@ void TriggerOnRemove_remove_no_match_1() {
     ECS_TRIGGER(world, Deinit, EcsOnRemove, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_assert(e != 0);
@@ -128,7 +128,7 @@ void TriggerOnRemove_delete_match_1_of_1() {
     ECS_TRIGGER(world, Deinit, EcsOnRemove, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_assert(e != 0);
@@ -157,7 +157,7 @@ void TriggerOnRemove_delete_match_1_of_2() {
     ECS_TRIGGER(world, Deinit, EcsOnRemove, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Type);
     test_assert(e != 0);
@@ -185,7 +185,7 @@ void TriggerOnRemove_delete_no_match_1() {
     ECS_TRIGGER(world, Deinit, EcsOnRemove, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Velocity);
     test_assert(e != 0);
@@ -271,7 +271,7 @@ void TriggerOnRemove_on_remove_in_on_update() {
     ECS_TRIGGER(world, Dummy, EcsOnRemove, Velocity);
 
     IterData ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e1 = ecs_new(world, Type);
     ecs_entity_t e2 = ecs_new(world, Type);

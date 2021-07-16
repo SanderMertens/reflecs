@@ -1,0 +1,28 @@
+{
+    "id": "basic",
+    "type": "application",
+    "value": {
+        "author": "Sander Mertens",
+        "description": "High level tests to quickly find broken code",
+        "public": false,
+        "coverage": false,
+        "use": [
+            "flecs",
+            "flecs.os_api.bake"
+        ]
+    },
+    "test": {
+        "testsuites": [{
+            "id": "Basic",
+            "testcases": [
+                "world",
+                "entities",
+                "filters",
+                "triggers",
+                "observers",
+                "queries",
+                "systems"
+            ]
+        }]
+    }
+}

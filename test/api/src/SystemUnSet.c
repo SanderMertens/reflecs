@@ -23,7 +23,7 @@ void SystemUnSet_unset_1_of_1() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -69,7 +69,7 @@ void SystemUnSet_unset_1_of_2() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -122,7 +122,7 @@ void SystemUnSet_unset_1_of_3() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position, Velocity, Mass);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -183,7 +183,7 @@ void SystemUnSet_unset_on_delete_1() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);    
+    ecs_set_ctx(world, &ctx);    
 
     ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -218,7 +218,7 @@ void SystemUnSet_unset_on_delete_2() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);    
+    ecs_set_ctx(world, &ctx);    
 
     ecs_entity_t e1 = ecs_new(world, Position);
     ecs_add(world, e1, Velocity);
@@ -259,7 +259,7 @@ void SystemUnSet_unset_on_delete_3() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position, Velocity, Mass);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);    
+    ecs_set_ctx(world, &ctx);    
 
     ecs_entity_t e1 = ecs_new(world, Position);
     ecs_add(world, e1, Velocity);
@@ -304,7 +304,7 @@ void SystemUnSet_unset_on_fini_1() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);    
+    ecs_set_ctx(world, &ctx);    
 
     ecs_entity_t e1 = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -342,7 +342,7 @@ void SystemUnSet_unset_on_fini_2() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);    
+    ecs_set_ctx(world, &ctx);    
 
     ecs_entity_t e1 = ecs_new(world, Position);
     ecs_add(world, e1, Velocity);
@@ -389,7 +389,7 @@ void SystemUnSet_unset_on_fini_3() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position, Velocity, Mass);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);    
+    ecs_set_ctx(world, &ctx);    
 
     ecs_entity_t e1 = ecs_new(world, Position);
     ecs_add(world, e1, Velocity);
@@ -447,7 +447,7 @@ void SystemUnSet_overlapping_unset_systems() {
     ECS_SYSTEM(world, UnSet, EcsUnSet, Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);  
+    ecs_set_ctx(world, &ctx);  
 
     ecs_entity_t e = ecs_new(world, Position);
     ecs_add(world, e, Velocity);
@@ -473,7 +473,7 @@ void SystemUnSet_overlapping_unset_systems() {
 
 static
 void UnSet_TestComp(ecs_iter_t *it) {
-    if (!ecs_get_context(it->world)) {
+    if (!ecs_get_ctx(it->world)) {
         return;
     }
 
@@ -497,7 +497,7 @@ void SystemUnSet_unset_move_to_nonempty_table() {
     ECS_SYSTEM(world, UnSet_TestComp, EcsUnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);  
+    ecs_set_ctx(world, &ctx);  
 
     ecs_new(world, Type);
     test_int(ctx.invoked, 0);
@@ -528,14 +528,14 @@ void SystemUnSet_unset_move_to_nonempty_table() {
     test_int(ctx.s[0][0], 0);
 
     /* Prevent system from getting called by fini */
-    ecs_set_context(world, NULL);
+    ecs_set_ctx(world, NULL);
 
     ecs_fini(world);
 }
 
 static
 void UnSet_WriteComp(ecs_iter_t *it) {
-    if (!ecs_get_context(it->world)) {
+    if (!ecs_get_ctx(it->world)) {
         return;
     }
 
@@ -570,7 +570,7 @@ void SystemUnSet_write_in_unset() {
     ecs_set(world, e, Velocity, {1, 2});
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_remove(world, e, Position);
 
@@ -589,7 +589,7 @@ void SystemUnSet_write_in_unset() {
     test_int(ctx.s[0][1], 0);    
 
     /* Prevent system from getting called by fini */
-    ecs_set_context(world, NULL);    
+    ecs_set_ctx(world, NULL);    
 
     const Velocity *v = ecs_get(world, e, Velocity);
     test_int(v->x, 2);

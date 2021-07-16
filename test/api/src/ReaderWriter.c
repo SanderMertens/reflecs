@@ -173,7 +173,7 @@ int simple_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, Position);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 3);
 
@@ -254,7 +254,7 @@ int id_test(int buffer_size) {
 
     ECS_SYSTEM(world, Dummy, EcsOnUpdate, flecs.core.Name);
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);      
+    ecs_set_ctx(world, &ctx);      
     ecs_progress(world, 0);
     test_int(ctx.count, id_count + 1); /* System itself also has EcsName */
 
@@ -412,7 +412,7 @@ int id_w_simple_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, Position, flecs.core.Name);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 8);
 
@@ -480,7 +480,7 @@ int unaligned_test(int buffer_size, int entity_count) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, Byte);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, entity_count);
 
@@ -556,7 +556,7 @@ int tag_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, Tag);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 3);
 
@@ -644,7 +644,7 @@ int simple_w_tag_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, Position, Tag);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 3);      
 
@@ -732,7 +732,7 @@ int tag_w_simple_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, Position, Tag);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 3);   
 
@@ -854,7 +854,7 @@ int parent_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, PARENT:Position);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 3);      
 
@@ -946,7 +946,7 @@ int simple_w_parent_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, PARENT:Position);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 3);      
 
@@ -1020,7 +1020,7 @@ int inheritance_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, ANY:Position);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 4);
 
@@ -1120,7 +1120,7 @@ int simple_w_inheritance_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, ANY:Position, Velocity);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 3);
 
@@ -1199,7 +1199,7 @@ int deserialize_twice_test(int buffer_size) {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, Position);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 3);
 
@@ -1263,7 +1263,7 @@ void ReaderWriter_entity_conflict() {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, Position);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 1);
 
@@ -1328,7 +1328,7 @@ void ReaderWriter_snapshot_reader_simple() {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, Position);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, 3);
 
@@ -1398,7 +1398,7 @@ void ReaderWriter_snapshot_reader_id() {
 
         ECS_SYSTEM(world, Dummy, EcsOnUpdate, flecs.core.Name);
         Probe ctx = {0};
-        ecs_set_context(world, &ctx);      
+        ecs_set_ctx(world, &ctx);      
         ecs_progress(world, 0);
         test_int(ctx.count, id_count + 1); /* System itself also has EcsName */
 

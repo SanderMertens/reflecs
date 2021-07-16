@@ -265,7 +265,7 @@ void Switch_query_switch() {
     ECS_ENTITY(world, e3, SWITCH | Movement, CASE | Running);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -299,7 +299,7 @@ void Switch_query_1_case_1_type() {
     ECS_ENTITY(world, e3, SWITCH | Movement, CASE | Running);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -338,7 +338,7 @@ void Switch_query_1_case_2_types() {
     ECS_ENTITY(world, e7, SWITCH | Movement, CASE | Running, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -391,7 +391,7 @@ void Switch_query_2_cases_1_type() {
         SWITCH | Direction, CASE | Front);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -457,7 +457,7 @@ void Switch_query_2_cases_2_types() {
         SWITCH | Direction, CASE | Front);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 

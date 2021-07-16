@@ -473,7 +473,7 @@ void *ecs_element_w_size(
 #define ecs_element(it, type, column, row)\
     ((type*)ecs_element_w_size(it, sizeof(type), column, row))
 
-ECS_DEPRECATED("use ecs_term_source")
+ECS_DEPRECATED("use ecs_term_subject")
 FLECS_API
 ecs_entity_t ecs_column_source(
     const ecs_iter_t *it,

@@ -423,6 +423,8 @@ const char* ecs_strerror(
         return "possible cycle detected";
     case ECS_LOCKED_STORAGE:
         return "cannot modify locked storage (defer operation / don't use readonly world)";
+    case ECS_RETRIGGER_UNSUPPORTED:
+        return "retriggering not supported for event";
     }
 
     return "unknown error code";

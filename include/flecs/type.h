@@ -85,9 +85,10 @@ bool ecs_type_owns_type(
     bool owned);
 
 FLECS_API
-bool ecs_type_find_id(
+int32_t ecs_type_find_id(
     const ecs_world_t *world,
     ecs_type_t type,
+    int32_t offset,
     ecs_entity_t id,
     ecs_entity_t rel,
     int32_t min_depth,

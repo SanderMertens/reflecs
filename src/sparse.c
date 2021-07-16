@@ -590,7 +590,7 @@ bool ecs_sparse_exists(
     return dense != 0;
 }
 
-void* _ecs_sparse_get(
+void* _ecs_sparse_get_dense(
     const ecs_sparse_t *sparse,
     ecs_size_t size,
     int32_t dense_index)
@@ -630,7 +630,7 @@ uint64_t ecs_sparse_get_current(
     return dense_array[dense];
 }
 
-void* _ecs_sparse_get_sparse(
+void* _ecs_sparse_get(
     const ecs_sparse_t *sparse,
     ecs_size_t size,
     uint64_t index)
@@ -642,7 +642,7 @@ void* _ecs_sparse_get_sparse(
     return try_sparse(sparse, index);
 }
 
-void* _ecs_sparse_get_sparse_any(
+void* _ecs_sparse_get_any(
     ecs_sparse_t *sparse,
     ecs_size_t size,
     uint64_t index)
@@ -702,7 +702,7 @@ void sparse_copy(
 
     for (i = 0; i < count - 1; i ++) {
         uint64_t index = indices[i];
-        void *src_ptr = _ecs_sparse_get_sparse(src, size, index);
+        void *src_ptr = _ecs_sparse_get(src, size, index);
         void *dst_ptr = _ecs_sparse_ensure(dst, size, index);
         ecs_sparse_set_generation(dst, index);
         ecs_os_memcpy(dst_ptr, src_ptr, size);
@@ -745,4 +745,19 @@ void ecs_sparse_memory(
     (void)sparse;
     (void)allocd;
     (void)used;
+}
+
+ecs_sparse_iter_t _ecs_sparse_iter(
+    ecs_sparse_t *sparse,
+    ecs_size_t elem_size)
+{
+    ecs_assert(sparse != NULL, ECS_INVALID_PARAMETER, NULL);
+    ecs_assert(elem_size == sparse->size, ECS_INVALID_PARAMETER, NULL);
+    ecs_sparse_iter_t result;
+    result.sparse = sparse;
+    result.ids = ecs_sparse_ids(sparse);
+    result.size = elem_size;
+    result.i = 0;
+    result.count = sparse->count - 1;
+    return result;
 }

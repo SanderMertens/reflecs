@@ -10,11 +10,11 @@ void Iter(ecs_iter_t *it) {
     Velocity *v = NULL;
     Mass *m = NULL;
         
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         v = ecs_term(it, Velocity, 2);
     }
 
-    if (it->column_count >= 3) {
+    if (it->term_count >= 3) {
         m = ecs_term(it, Mass, 3);
     }
 
@@ -48,7 +48,7 @@ void SystemManual_1_type_1_component() {
     
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_run(world, Iter, 1, NULL);
 

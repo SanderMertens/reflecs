@@ -57,7 +57,7 @@ void DirectAccess_insert_record() {
 
     ecs_iter_t it = ecs_query_iter(q);
     test_assert(ecs_query_next(&it));
-    test_assert(it.table->table == table);
+    test_assert(it.table == table);
     test_int(it.count, 1);
     test_int(it.entities[0], 0);
 
@@ -96,7 +96,7 @@ void DirectAccess_insert_record_w_entity() {
 
     ecs_iter_t it = ecs_query_iter(q);
     test_assert(ecs_query_next(&it));
-    test_assert(it.table->table == table);
+    test_assert(it.table == table);
     test_int(it.count, 1);
     test_int(it.entities[0], e);
 

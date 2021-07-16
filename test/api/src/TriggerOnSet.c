@@ -5,7 +5,7 @@ void OnSet(ecs_iter_t *it) {
     ECS_COLUMN(it, Position, p, 1);
 
     Velocity *v = NULL;
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         v = ecs_term(it, Velocity, 2);
     }
 
@@ -37,7 +37,7 @@ void TriggerOnSet_set() {
     ECS_SYSTEM(world, OnSet, EcsOnSet, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.count, 0);
@@ -70,7 +70,7 @@ void TriggerOnSet_set_new() {
     ECS_SYSTEM(world, OnSet, EcsOnSet, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_set(world, 0, Position, {10, 20});
     
@@ -100,7 +100,7 @@ void TriggerOnSet_set_again() {
     ECS_SYSTEM(world, OnSet, EcsOnSet, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.count, 0);
@@ -140,7 +140,7 @@ void TriggerOnSet_clone() {
     ECS_SYSTEM(world, OnSet, EcsOnSet, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e1 = ecs_set(world, 0, Position, {10, 20});
     
@@ -178,7 +178,7 @@ void TriggerOnSet_clone_w_value() {
     ECS_SYSTEM(world, OnSet, EcsOnSet, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e1 = ecs_set(world, 0, Position, {10, 20});
     
@@ -266,7 +266,7 @@ void TriggerOnSet_set_and_add_system() {
     ECS_TRIGGER(world, OnAdd_check_order, EcsOnAdd, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, 0);
     test_int(ctx.count, 0);
@@ -301,7 +301,7 @@ void OnSetShared(ecs_iter_t *it) {
     ECS_COLUMN(it, Position, p, 1);
 
     Velocity *v = NULL;
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         v = ecs_term(it, Velocity, 2);
     }
 
@@ -327,7 +327,7 @@ void TriggerOnSet_on_set_after_override() {
     ECS_SYSTEM(world, OnSetShared, EcsOnSet, ANY:Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* instantiate prefab */
     ecs_entity_t e = ecs_new_w_pair(world, EcsIsA, Prefab);
@@ -401,7 +401,7 @@ void TriggerOnSet_on_set_after_override_w_new() {
     ECS_SYSTEM(world, OnSet, EcsOnSet, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Type);
 
@@ -436,7 +436,7 @@ void TriggerOnSet_on_set_after_override_w_new_w_count() {
     ECS_SYSTEM(world, OnSet, EcsOnSet, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new(world, Type, 3);
     test_assert(ids != NULL);
@@ -475,7 +475,7 @@ void TriggerOnSet_on_set_after_override_1_of_2_overridden() {
     ECS_SYSTEM(world, OnSet, EcsOnSet, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Type);
 
@@ -521,7 +521,7 @@ void TriggerOnSet_on_set_after_snapshot_restore() {
     }
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_snapshot_t *s = ecs_snapshot_take(world);
 

@@ -53,7 +53,7 @@ void Pairs_type_w_one_pair() {
     test_assert( ecs_has_pair(world, e2, ecs_typeid(Rel), ecs_typeid(Velocity)));
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 0);
 
@@ -125,7 +125,7 @@ void Pairs_type_w_two_pairs() {
     test_assert( ecs_has_pair(world, e2, ecs_typeid(Rel), ecs_typeid(Position)));
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 0);
 
@@ -240,7 +240,7 @@ void Pairs_add_tag_pair_for_tag() {
     test_assert( ecs_has_pair(world, e2, Rel, Tag2));
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 0);
 
@@ -310,7 +310,7 @@ void Pairs_add_tag_pair_for_component() {
     test_assert( ecs_has_pair(world, e2, Rel, ecs_typeid(Velocity)));
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 0);
 
@@ -393,7 +393,7 @@ void Pairs_query_2_pairs() {
 
     /* Run system */
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
     ecs_progress(world, 0);
 
     const RelA *tr_a = ecs_get_pair(world, e1, RelA, ecs_typeid(Position));
@@ -462,7 +462,7 @@ void Pairs_query_2_pairs_2_instances_per_type() {
 
     /* Run system */
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
     ecs_progress(world, 0);
 
     const RelA *tr_a = ecs_get_pair(world, e1, RelA, ecs_typeid(Position));
@@ -604,7 +604,7 @@ void Pairs_pair_wildcard_system() {
     ecs_set(world, 0, Position, { 10, 20 });
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 0);
 
@@ -681,7 +681,7 @@ void Pairs_pair_only_wildcard_system() {
     ecs_set(world, 0, Position, { 10, 20 });
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 0);
 
@@ -763,7 +763,7 @@ void Pairs_on_add_pair() {
     ECS_TRIGGER(world, PairTrigger, EcsOnAdd, (Rel, *));
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, 0);
     ecs_add_pair(world, e, ecs_typeid(Rel), ecs_typeid(Position));
@@ -809,7 +809,7 @@ void Pairs_on_add_pair_tag() {
     ECS_TRIGGER(world, PairTrigger, EcsOnAdd, (Rel, Position));
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, 0);
     ecs_add_pair(world, e, Rel, ecs_typeid(Position));
@@ -840,7 +840,7 @@ void Pairs_on_remove_pair() {
     ECS_TRIGGER(world, PairTrigger, EcsOnRemove, (Rel, *));
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, 0);
     ecs_add_pair(world, e, ecs_typeid(Rel), ecs_typeid(Position));
@@ -888,7 +888,7 @@ void Pairs_on_remove_pair_tag() {
     ECS_TRIGGER(world, PairTrigger, EcsOnRemove, (Rel, Position));
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, 0);
     ecs_add_pair(world, e, Rel, ecs_typeid(Position));
@@ -921,7 +921,7 @@ void Pairs_on_remove_pair_on_delete() {
     ECS_TRIGGER(world, PairTrigger, EcsOnRemove, (Rel, *));
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, 0);
     ecs_add_pair(world, e, ecs_typeid(Rel), ecs_typeid(Position));
@@ -974,7 +974,7 @@ void Pairs_on_remove_pair_tag_on_delete() {
     ECS_TRIGGER(world, PairTriggerVelocity, EcsOnRemove, (Rel, Velocity));
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, 0);
     ecs_add_pair(world, e, Rel, ecs_typeid(Position));
@@ -1571,7 +1571,7 @@ void Pairs_dsl_pair_w_explicit_subj() {
     test_int(it.count, 1);
     test_int(it.entities[0], e4);
     test_int(ecs_term_id(&it, 1), ecs_pair(Rel, Obj));
-    test_int(ecs_term_source(&it, 1), Subj);
+    test_int(ecs_term_subject(&it, 1), Subj);
 
     test_bool(ecs_query_next(&it), false); 
 
@@ -1858,7 +1858,7 @@ void Pairs_api_pair_w_explicit_subj() {
     test_int(it.count, 1);
     test_int(it.entities[0], e4);
     test_int(ecs_term_id(&it, 1), ecs_pair(Rel, Obj));
-    test_int(ecs_term_source(&it, 1), Subj);
+    test_int(ecs_term_subject(&it, 1), Subj);
 
     test_bool(ecs_query_next(&it), false); 
 

@@ -22,7 +22,7 @@ void System_w_FromId_2_column_1_from_id() {
     ECS_SYSTEM(world, Iter, EcsOnUpdate, Position, :Velocity);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
 
@@ -53,7 +53,7 @@ void System_w_FromId_3_column_2_from_id() {
     ECS_SYSTEM(world, Iter, EcsOnUpdate, Position, :Velocity, :Rotation);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
 
@@ -95,7 +95,7 @@ void System_w_FromId_column_type() {
     ECS_SYSTEM(world, CheckColumnType, EcsOnUpdate, Position, :Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_new(world, Position);
 

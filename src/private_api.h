@@ -4,7 +4,7 @@
 #include "private_types.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-//// Core bootstrap functions
+//// Bootstrap functions
 ////////////////////////////////////////////////////////////////////////////////
 
 #define ECS_TYPE_DECL(component)\
@@ -37,6 +37,8 @@ ecs_type_t ecs_bootstrap_type(
     ecs_set(world, name, EcsName, {.value = &#name[ecs_os_strlen("Ecs")], .symbol = (char*)#name});\
     ecs_add_pair(world, name, EcsChildOf, ecs_get_scope(world))
 
+void ecs_bootstrap_trigger_iterables(
+    ecs_world_t *world);
 
 ////////////////////////////////////////////////////////////////////////////////
 //// Entity API
@@ -75,11 +77,6 @@ void ecs_unregister_name(
 //// World API
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Notify systems that there is a new table, which triggers matching */
-void ecs_notify_queries_of_table(
-    ecs_world_t *world,
-    ecs_table_t *table);
-
 /* Get current stage */
 ecs_stage_t* ecs_stage_from_world(
     ecs_world_t **world_ptr);
@@ -112,15 +109,6 @@ void ecs_monitor_register(
     ecs_entity_t id,
     ecs_query_t *query);
 
-void ecs_notify_tables(
-    ecs_world_t *world,
-    ecs_id_t id,
-    ecs_table_event_t *event);
-
-void ecs_notify_queries(
-    ecs_world_t *world,
-    ecs_query_event_t *event);
-
 void ecs_register_table(
     ecs_world_t *world,
     ecs_table_t *table);
@@ -143,15 +131,17 @@ void ecs_clear_id_record(
 
 void ecs_triggers_notify(
     ecs_world_t *world,
-    ecs_id_t id,
+    ecs_object_t *observable,
+    ecs_ids_t *ids,
     ecs_entity_t event,
+    ecs_entity_t entity,
     ecs_table_t *table,
-    ecs_data_t *data,
     int32_t row,
-    int32_t count);
+    int32_t count,
+    void *param);
 
 ecs_map_t* ecs_triggers_get(
-    const ecs_world_t *world,
+    const ecs_object_t *object,
     ecs_id_t id,
     ecs_entity_t event);
 
@@ -325,19 +315,9 @@ void ecs_run_add_actions(
 void ecs_run_remove_actions(
     ecs_world_t *world,
     ecs_table_t *table,
-    ecs_data_t *data,
     int32_t row,
     int32_t count,
     ecs_ids_t *removed);
-
-void ecs_run_set_systems(
-    ecs_world_t *world,
-    ecs_ids_t *components,
-    ecs_table_t *table,
-    ecs_data_t *data,
-    int32_t row,
-    int32_t count,
-    bool set_all);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -362,18 +342,6 @@ ecs_data_t* ecs_init_data(
     ecs_world_t *world,
     ecs_table_t *table,
     ecs_data_t *result); 
-
-/* Activates / deactivates table for systems. A deactivated table will not be
- * evaluated when the system is invoked. Tables automatically get activated /
- * deactivated when they become non-empty / empty. 
- *
- * If a query is provided, the table will only be activated / deactivated for
- * that query. */
-void ecs_table_activate(
-    ecs_world_t *world,
-    ecs_table_t *table,
-    ecs_query_t *query,
-    bool activate);
 
 /* Clear all entities from a table. */
 void ecs_table_clear_entities(
@@ -464,11 +432,6 @@ int32_t* ecs_table_get_monitor(
 void ecs_init_root_table(
     ecs_world_t *world);
 
-/* Unset components in table */
-void ecs_table_remove_actions(
-    ecs_world_t *world,
-    ecs_table_t *table);
-
 /* Free table */
 void ecs_table_free(
     ecs_world_t *world,
@@ -521,7 +484,7 @@ void ecs_table_mark_dirty(
     ecs_table_t *table,
     ecs_entity_t component);
 
-const EcsComponent* ecs_component_from_id(
+const EcsComponent* ecs_get_component(
     const ecs_world_t *world,
     ecs_entity_t e);
 
@@ -529,11 +492,6 @@ int32_t ecs_table_switch_from_case(
     const ecs_world_t *world,
     const ecs_table_t *table,
     ecs_entity_t add);    
-
-void ecs_table_notify(
-    ecs_world_t *world,
-    ecs_table_t *table,
-    ecs_table_event_t *event);
 
 void ecs_table_clear_edges(
     ecs_world_t *world,
@@ -561,25 +519,46 @@ void ecs_query_rematch(
     ecs_world_t *world,
     ecs_query_t *query);
 
-void ecs_run_monitor(
-    ecs_world_t *world,
-    ecs_matched_query_t *monitor,
-    ecs_ids_t *components,
-    int32_t row,
-    int32_t count,
-    ecs_entity_t *entities);
-
 bool ecs_query_match(
     const ecs_world_t *world,
     const ecs_table_t *table,
     const ecs_query_t *query,
     ecs_match_failure_t *failure_info);
 
-void ecs_query_notify(
-    ecs_world_t *world,
-    ecs_query_t *query,
-    ecs_query_event_t *event);
 
+////////////////////////////////////////////////////////////////////////////////
+//// Filter API
+////////////////////////////////////////////////////////////////////////////////
+
+bool ecs_filter_populate_from_type(
+    ecs_world_t *world,
+    const ecs_filter_t *filter,
+    ecs_type_t type,
+    ecs_cached_type_t *matched,
+    bool first);
+
+void ecs_filter_populate_from_table(
+    ecs_world_t *world,
+    const ecs_filter_t *filter,
+    ecs_table_t *table,
+    ecs_cached_type_t *matched,
+    void **columns);
+
+
+////////////////////////////////////////////////////////////////////////////////
+//// Iter API
+////////////////////////////////////////////////////////////////////////////////
+
+void ecs_iter_init_from(
+    ecs_iter_t *dst, 
+    ecs_iter_t *src);
+
+void ecs_iter_init_from_cached_type(
+    ecs_iter_t *it, 
+    ecs_cached_type_t *type);
+
+void ecs_iter_init_from_storage(
+    ecs_iter_t *it);
 
 ////////////////////////////////////////////////////////////////////////////////
 //// Time API
@@ -597,6 +576,50 @@ void ecs_os_time_sleep(
 FLECS_API
 void ecs_increase_timer_resolution(
     bool enable);
+
+
+////////////////////////////////////////////////////////////////////////////////
+//// Object API
+////////////////////////////////////////////////////////////////////////////////
+
+void _ecs_object_init(
+    ecs_object_t *object,
+    int32_t kind,
+    ecs_size_t size,
+    ecs_mixins_t *mixins);
+
+#define ecs_object_init(object, type)\
+    _ecs_object_init(object, ECS_##type##_MAGIC, sizeof(type), &type##_mixins)
+
+void _ecs_object_fini(
+    ecs_object_t *object,
+    int32_t kind);
+
+#define ecs_object_fini(object, type)\
+    _ecs_object_fini(object, ECS_##type##_MAGIC)
+
+#ifndef NDEBUG
+void _ecs_object_assert(
+    const ecs_object_t *object,
+    int32_t type,
+    const char *file,
+    int32_t line);
+
+#define ecs_object_assert(object, type)\
+    _ecs_object_assert(object, ECS_##type##_MAGIC, __FILE__, __LINE__)
+#else
+#define ecs_object_assert(object, type)
+#endif
+
+bool _ecs_object_is(
+    const ecs_object_t *object,
+    int32_t type);
+
+#define ecs_object_is(object, type)\
+    _ecs_object_is(object, ECS_##type##_MAGIC)
+
+ecs_observable_t* ecs_get_observable(
+    const ecs_object_t *object);
 
 ////////////////////////////////////////////////////////////////////////////////
 //// Utilities

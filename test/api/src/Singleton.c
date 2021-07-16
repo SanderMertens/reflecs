@@ -66,7 +66,7 @@ void Singleton_system_w_singleton() {
     test_assert( !ecs_has(world, EcsSingleton, Position));
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
     
     ecs_progress(world, 1);
 
@@ -91,7 +91,7 @@ void Singleton_system_w_singleton_no_match() {
     test_assert( !ecs_has(world, EcsSingleton, Position));
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -108,7 +108,7 @@ void Singleton_system_w_not_singleton() {
     ECS_SYSTEM(world, Iter_w_singleton, EcsOnUpdate, Position, !$:Velocity);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 

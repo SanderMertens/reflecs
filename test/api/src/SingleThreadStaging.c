@@ -7,7 +7,7 @@ void SingleThreadStaging_setup() {
 
 static
 void NewEmpty(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
 
     int i;
     for (i = 0; i < it->count; i ++) {
@@ -28,7 +28,7 @@ void SingleThreadStaging_new_empty() {
     ECS_SYSTEM(world, NewEmpty, EcsOnUpdate, Position);
 
     IterData ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -45,7 +45,7 @@ void SingleThreadStaging_new_empty() {
 
 static
 void New_w_component(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ecs_entity_t e;
@@ -71,7 +71,7 @@ void SingleThreadStaging_new_w_component() {
     ECS_SYSTEM(world, New_w_component, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -101,7 +101,7 @@ void SingleThreadStaging_new_w_type_of_2() {
     ECS_SYSTEM(world, New_w_component, EcsOnUpdate, Position);
 
     IterData ctx = {.type = ecs_type(Type)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -120,7 +120,7 @@ void SingleThreadStaging_new_w_type_of_2() {
 
 static
 void NewEmpty_w_count(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
 
     ctx->new_entities[ctx->entity_count] = ecs_bulk_new(it->world, 0, 1000)[0];
     ctx->entity_count ++;
@@ -134,7 +134,7 @@ void SingleThreadStaging_new_empty_w_count() {
     ECS_SYSTEM(world, NewEmpty_w_count, EcsOnUpdate, Position);
 
     IterData ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -151,7 +151,7 @@ void SingleThreadStaging_new_empty_w_count() {
 
 static
 void New_w_component_w_count(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     const ecs_entity_t *ids;
     if (ctx->component) {
         ids = ecs_bulk_new_w_entity(it->world, ctx->component, 1000);
@@ -170,7 +170,7 @@ void SingleThreadStaging_new_component_w_count() {
     ECS_SYSTEM(world, New_w_component_w_count, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -196,7 +196,7 @@ void SingleThreadStaging_new_type_w_count() {
     ECS_SYSTEM(world, New_w_component_w_count, EcsOnUpdate, Position);
 
     IterData ctx = {.type = ecs_type(Type)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -214,7 +214,7 @@ void SingleThreadStaging_new_type_w_count() {
 
 static
 void Add_to_new_empty(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ecs_entity_t e = ecs_new(it->world, 0);
@@ -241,7 +241,7 @@ void SingleThreadStaging_add_to_new_empty() {
     ECS_SYSTEM(world, Add_to_new_empty, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -270,7 +270,7 @@ void SingleThreadStaging_2_add_to_new_empty() {
     ECS_SYSTEM(world, Add_to_new_empty, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Velocity), .component_2 = ecs_typeid(Rotation)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -289,7 +289,7 @@ void SingleThreadStaging_2_add_to_new_empty() {
 
 static
 void Add_remove_same_from_new(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ecs_entity_t e = ecs_new(it->world, 0);
@@ -323,7 +323,7 @@ void SingleThreadStaging_add_remove_same_to_new_empty() {
     ECS_SYSTEM(world, Add_remove_same_from_new, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -350,7 +350,7 @@ void SingleThreadStaging_add_remove_2_same_to_new_empty() {
     ECS_SYSTEM(world, Add_remove_same_from_new, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position), .component_2 = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -367,7 +367,7 @@ void SingleThreadStaging_add_remove_2_same_to_new_empty() {
 
 static
 void Add_remove_same_from_new_w_component(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ecs_entity_t e = ecs_new_w_entity(it->world, ctx->component);
@@ -394,7 +394,7 @@ void SingleThreadStaging_add_remove_same_to_new_w_component() {
     ECS_SYSTEM(world, Add_remove_same_from_new_w_component, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position), .component_2 = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -413,7 +413,7 @@ void SingleThreadStaging_add_remove_same_to_new_w_component() {
 
 static
 void Add_remove_different_from_new_empty(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ecs_entity_t e = ecs_new(it->world, 0);
@@ -448,7 +448,7 @@ void SingleThreadStaging_2_add_1_remove_to_new_empty() {
     ECS_SYSTEM(world, Add_remove_different_from_new_empty, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation), .component_2 = ecs_typeid(Position), .component_3 = ecs_typeid(Mass)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -479,7 +479,7 @@ void SingleThreadStaging_2_add_1_remove_same_to_new_empty() {
     ECS_SYSTEM(world, Add_remove_different_from_new_empty, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation), .component_2 = ecs_typeid(Position), .component_3 = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -498,7 +498,7 @@ void SingleThreadStaging_2_add_1_remove_same_to_new_empty() {
 
 static
 void Clone_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ctx->new_entities[ctx->entity_count] = ecs_clone(it->world, 0, it->entities[i], false);
@@ -518,7 +518,7 @@ void SingleThreadStaging_clone() {
     ECS_SYSTEM(world, Clone_current, EcsOnUpdate, Position);
 
     IterData ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -543,7 +543,7 @@ void SingleThreadStaging_clone() {
 
 static
 void Clone_current_w_value(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ctx->new_entities[ctx->entity_count] = ecs_clone(it->world, 0, it->entities[i], true);
@@ -572,7 +572,7 @@ void SingleThreadStaging_clone_w_value() {
     ecs_set(world, e3, Mass, {50});
 
     IterData ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -606,7 +606,7 @@ void SingleThreadStaging_clone_w_value() {
 
 static
 void Add_to_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
 
     int i;
     for (i = 0; i < it->count; i ++) {
@@ -633,7 +633,7 @@ void SingleThreadStaging_add_to_current() {
     ECS_SYSTEM(world, Add_to_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -666,7 +666,7 @@ void SingleThreadStaging_2_add_to_current() {
     ECS_SYSTEM(world, Add_to_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Velocity), .component_2 = ecs_typeid(Rotation)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -690,7 +690,7 @@ void SingleThreadStaging_2_add_to_current() {
 
 static
 void Remove_from_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
 
     int i;
     for (i = it->count - 1; i >= 0; i --) {
@@ -718,7 +718,7 @@ void SingleThreadStaging_remove_from_current() {
     ECS_SYSTEM(world, Remove_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -757,7 +757,7 @@ void SingleThreadStaging_remove_2_from_current() {
     ECS_SYSTEM(world, Remove_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position), .component_2 = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -793,7 +793,7 @@ void SingleThreadStaging_remove_2_from_current() {
 
 static
 void Add_remove_same_from_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         if (ctx->component) {
@@ -820,7 +820,7 @@ void SingleThreadStaging_add_remove_same_to_current() {
     ECS_SYSTEM(world, Add_remove_same_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -861,7 +861,7 @@ void SingleThreadStaging_add_remove_same_existing_to_current() {
     ECS_SYSTEM(world, Add_remove_same_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -892,7 +892,7 @@ void SingleThreadStaging_add_remove_same_existing_to_current() {
 
 static
 void Remove_add_same_from_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         if (ctx->component) {
@@ -919,7 +919,7 @@ void SingleThreadStaging_remove_add_same_to_current() {
     ECS_SYSTEM(world, Remove_add_same_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -960,7 +960,7 @@ void SingleThreadStaging_remove_add_same_existing_to_current() {
     ECS_SYSTEM(world, Remove_add_same_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -998,7 +998,7 @@ void SingleThreadStaging_add_remove_2_same_to_current() {
     ECS_SYSTEM(world, Add_remove_same_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation), .component_2 = ecs_typeid(Mass)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1041,7 +1041,7 @@ void SingleThreadStaging_add_remove_2_same_existing_to_current() {
     ECS_SYSTEM(world, Add_remove_same_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position), .component_2 = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1085,7 +1085,7 @@ void SingleThreadStaging_remove_add_2_same_to_current() {
     ECS_SYSTEM(world, Remove_add_same_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation), .component_2 = ecs_typeid(Mass)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1162,7 +1162,7 @@ void SingleThreadStaging_remove_add_2_same_existing_to_current() {
     ECS_SYSTEM(world, Remove_add_same_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position), .component_2 = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1195,7 +1195,7 @@ void SingleThreadStaging_remove_add_2_same_existing_to_current() {
 
 static
 void Add_remove_different_from_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         if (ctx->component_3) {
@@ -1224,7 +1224,7 @@ void SingleThreadStaging_add_remove_different_to_current() {
     ECS_SYSTEM(world, Add_remove_different_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation), .component_2 = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1267,7 +1267,7 @@ void SingleThreadStaging_2_add_1_remove_to_current() {
     ECS_SYSTEM(world, Add_remove_different_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation), .component_2 = ecs_typeid(Position), .component_3 = ecs_typeid(Mass)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1304,7 +1304,7 @@ void SingleThreadStaging_2_add_1_remove_to_current() {
 
 static
 void Add_1_remove_2_different_from_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         if (ctx->component) {
@@ -1333,7 +1333,7 @@ void SingleThreadStaging_1_add_2_remove_to_current() {
     ECS_SYSTEM(world, Add_1_remove_2_different_from_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation), .component_2 = ecs_typeid(Position), .component_3 = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1368,7 +1368,7 @@ void SingleThreadStaging_1_add_2_remove_to_current() {
 
 static
 void Delete_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ecs_delete(it->world, it->entities[i]);
@@ -1388,7 +1388,7 @@ void SingleThreadStaging_delete_current() {
     ECS_SYSTEM(world, Delete_current, EcsOnUpdate, Position);
 
     IterData ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -1403,7 +1403,7 @@ void SingleThreadStaging_delete_current() {
 
 static
 void Delete_even(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         if (!(it->entities[i] % 2)) {
@@ -1431,7 +1431,7 @@ void SingleThreadStaging_delete_even() {
     ECS_SYSTEM(world, Delete_even, EcsOnUpdate, Position);
 
     IterData ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -1482,7 +1482,7 @@ void SingleThreadStaging_delete_even() {
 
 static
 void Delete_new_empty(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ecs_entity_t e = ecs_new(it->world, 0);
@@ -1504,7 +1504,7 @@ void SingleThreadStaging_delete_new_empty() {
     ECS_SYSTEM(world, Delete_new_empty, EcsOnUpdate, Position);
 
     IterData ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -1521,7 +1521,7 @@ void SingleThreadStaging_delete_new_empty() {
 
 static
 void Delete_new_w_component(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     int i;
     for (i = 0; i < it->count; i ++) {
         ecs_entity_t e = ecs_new_w_entity(it->world, ctx->component);
@@ -1543,7 +1543,7 @@ void SingleThreadStaging_delete_new_w_component() {
     ECS_SYSTEM(world, Delete_new_w_component, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -1560,7 +1560,7 @@ void SingleThreadStaging_delete_new_w_component() {
 
 static
 void Set_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
         ecs_entity_t ecs_typeid(Rotation) = ctx->component;
 
     int i;
@@ -1580,7 +1580,7 @@ void SingleThreadStaging_set_current() {
     ECS_SYSTEM(world, Set_current, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1618,7 +1618,7 @@ void SingleThreadStaging_set_current() {
 
 static
 void Set_new_empty(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     ecs_entity_t ecs_typeid(Rotation) = ctx->component;
 
     int i;
@@ -1640,7 +1640,7 @@ void SingleThreadStaging_set_new_empty() {
     ECS_SYSTEM(world, Set_new_empty, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Rotation)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1671,7 +1671,7 @@ void SingleThreadStaging_set_new_empty() {
 
 static
 void Set_new_w_component(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
 
     ecs_entity_t ecs_typeid(Rotation) = ctx->component_2;
 
@@ -1694,7 +1694,7 @@ void SingleThreadStaging_set_new_w_component() {
     ECS_SYSTEM(world, Set_new_w_component, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position), .component_2 = ecs_typeid(Rotation)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1726,7 +1726,7 @@ void SingleThreadStaging_set_new_w_component() {
 
 static
 void Set_existing_new_w_component(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     
     ecs_entity_t ecs_typeid(Position) = ctx->component;
 
@@ -1749,7 +1749,7 @@ void SingleThreadStaging_set_existing_new_w_component() {
     ECS_SYSTEM(world, Set_existing_new_w_component, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1781,7 +1781,7 @@ void SingleThreadStaging_set_existing_new_w_component() {
 
 static
 void Set_new_after_add(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     
     ecs_entity_t ecs_typeid(Position) = ctx->component;
 
@@ -1805,7 +1805,7 @@ void SingleThreadStaging_set_new_after_add() {
     ECS_SYSTEM(world, Set_new_after_add, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1837,7 +1837,7 @@ void SingleThreadStaging_set_new_after_add() {
 
 static
 void Remove_after_set(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     
     ecs_entity_t ecs_typeid(Position) = ctx->component;
 
@@ -1862,7 +1862,7 @@ void SingleThreadStaging_remove_after_set() {
     ECS_SYSTEM(world, Remove_after_set, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1892,7 +1892,7 @@ void SingleThreadStaging_remove_after_set() {
 
 static
 void Delete_after_set(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
     
     ecs_entity_t ecs_typeid(Position) = ctx->component;
 
@@ -1919,7 +1919,7 @@ void SingleThreadStaging_delete_after_set() {
     ECS_SYSTEM(world, Delete_after_set, EcsOnUpdate, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, 0);
@@ -1954,7 +1954,7 @@ void SingleThreadStaging_add_to_current_in_on_add() {
     ECS_TRIGGER(world, Add_to_current, EcsOnAdd, Position);
 
     IterData ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, Position);
@@ -1981,7 +1981,7 @@ void SingleThreadStaging_remove_from_current_in_on_add() {
     ECS_TRIGGER(world, Remove_from_current, EcsOnAdd, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, Type);
@@ -2008,7 +2008,7 @@ void SingleThreadStaging_remove_added_component_in_on_add() {
     ECS_TRIGGER(world, Remove_from_current, EcsOnAdd, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, Type);
@@ -2053,7 +2053,7 @@ void SingleThreadStaging_match_table_created_in_progress() {
     ECS_SYSTEM(world, On_PV, EcsOnUpdate, Position, Velocity);
 
     IterData add_ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &add_ctx);
+    ecs_set_ctx(world, &add_ctx);
 
     ecs_entity_t e1 = ecs_new(world, Position);
     ecs_entity_t e2 = ecs_new(world, Position);
@@ -2080,7 +2080,7 @@ void SingleThreadStaging_match_table_created_in_progress() {
 
 static
 void Set_velocity_on_new(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
 
     ecs_entity_t ecs_typeid(Velocity) = ctx->component;
 
@@ -2112,14 +2112,14 @@ void SingleThreadStaging_match_table_created_w_new_in_progress() {
     ECS_SYSTEM(world, On_V, EcsOnUpdate, Velocity);
 
     IterData add_ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &add_ctx);
+    ecs_set_ctx(world, &add_ctx);
 
     ecs_set(world, 0, Position, {10, 20});
 
     ecs_progress(world, 1);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
     ecs_enable(world, Set_velocity_on_new, false);
 
     ecs_progress(world, 1);
@@ -2147,12 +2147,12 @@ void SingleThreadStaging_match_table_created_w_new_in_on_set() {
     ECS_SYSTEM(world, On_V, EcsOnUpdate, Velocity);
 
     IterData add_ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &add_ctx);
+    ecs_set_ctx(world, &add_ctx);
 
     ecs_set(world, 0, Position, {10, 20});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
     ecs_enable(world, Set_velocity_on_new, false);
 
     ecs_progress(world, 1);
@@ -2189,7 +2189,7 @@ void SingleThreadStaging_merge_table_w_container_added_in_progress() {
     ECS_ENTITY(world, e1, Position);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -2217,7 +2217,7 @@ void SingleThreadStaging_merge_table_w_container_added_on_set() {
     ECS_ENTITY(world, e1, 0);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_set(world, e1, Position, {10, 20});
 
@@ -2270,7 +2270,7 @@ void SingleThreadStaging_merge_table_w_container_added_on_set_reverse() {
     ECS_ENTITY(world, e1, 0);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_set(world, e1, Position, {10, 20});
 
@@ -2295,7 +2295,7 @@ static
 void Task(ecs_iter_t *it) {
     ECS_COLUMN(it, Position, p, 1);
 
-    ecs_entity_t *e = ecs_get_context(it->world);
+    ecs_entity_t *e = ecs_get_ctx(it->world);
 
     ecs_add(it->world, *e, Position);
 }
@@ -2309,7 +2309,7 @@ void SingleThreadStaging_merge_after_tasks() {
 
     ECS_SYSTEM(world, Task, EcsOnUpdate, :Position);
 
-    ecs_set_context(world, &e);
+    ecs_set_ctx(world, &e);
 
     ecs_progress(world, 1);
 
@@ -2816,7 +2816,7 @@ void SingleThreadStaging_lock_table() {
 
     ecs_iter_t it = ecs_query_iter(q);
     while (ecs_query_next(&it)) {
-        ecs_table_t *table = it.table->table;
+        ecs_table_t *table = it.table;
         test_assert(table != NULL);
         
         ecs_table_lock(world, table);
@@ -2843,7 +2843,7 @@ void SingleThreadStaging_recursive_lock_table() {
 
     ecs_iter_t it = ecs_query_iter(q);
     while (ecs_query_next(&it)) {
-        ecs_table_t *table = it.table->table;
+        ecs_table_t *table = it.table;
         test_assert(table != NULL);
         
         ecs_table_lock(world, table);
@@ -2872,7 +2872,7 @@ void SingleThreadStaging_modify_after_lock() {
 
     ecs_iter_t it = ecs_query_iter(q);
     while (ecs_query_next(&it)) {    
-        ecs_table_t *table = it.table->table;
+        ecs_table_t *table = it.table;
         test_assert(table != NULL);
                     
         ecs_table_lock(world, table);

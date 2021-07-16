@@ -293,3 +293,50 @@ void Has_has_entity_owned_0_component() {
 
     ecs_fini(world);
 }
+
+void Has_has_wildcard() {
+    ecs_world_t *world = ecs_init();
+
+    ECS_TAG(world, Tag_1);
+    ECS_TAG(world, Tag_2);
+
+    ecs_entity_t e1 = ecs_new_id(world);
+    test_assert(e1 != 0);
+
+    ecs_entity_t e2 = ecs_new_id(world);
+    test_assert(e2 != 0);    
+
+    ecs_add_id(world, e1, Tag_1);
+
+    test_bool(ecs_has_id(world, e1, Tag_1), true);
+    test_bool(ecs_has_id(world, e1, Tag_2), false);
+    test_bool(ecs_has_id(world, e1, EcsWildcard), true);
+ 
+    test_bool(ecs_has_id(world, e2, Tag_1), false);
+    test_bool(ecs_has_id(world, e2, Tag_2), false);
+    test_bool(ecs_has_id(world, e2, EcsWildcard), false);
+
+    ecs_fini(world);
+}
+
+void Has_has_wildcard_pair() {
+    ecs_world_t *world = ecs_init();
+
+    ECS_TAG(world, Rel);
+    ECS_TAG(world, Obj_1);
+    ECS_TAG(world, Obj_2);
+
+    ecs_entity_t e = ecs_new_id(world);
+    test_assert(e != 0);
+
+    ecs_add_pair(world, e, Rel, Obj_1);
+
+    test_bool(ecs_has_pair(world, e, Rel, Obj_1), true);
+    test_bool(ecs_has_pair(world, e, Rel, Obj_2), false);
+    test_bool(ecs_has_pair(world, e, Rel, EcsWildcard), true);
+    test_bool(ecs_has_pair(world, e, EcsWildcard, Obj_1), true);
+    test_bool(ecs_has_pair(world, e, EcsWildcard, Obj_2), false);
+    test_bool(ecs_has_pair(world, e, EcsWildcard, EcsWildcard), true);
+ 
+    ecs_fini(world);
+}

@@ -138,6 +138,25 @@ void Entity_entity_view_null_entity_w_world(void);
 void Entity_entity_view_null_entity_w_0(void);
 void Entity_entity_view_null_entity_w_world_w_0(void);
 void Entity_is_wildcard(void);
+void Entity_has_id_t(void);
+void Entity_has_pair_id_t(void);
+void Entity_has_pair_id_t_w_type(void);
+void Entity_has_id(void);
+void Entity_has_pair_id(void);
+void Entity_has_pair_id_w_type(void);
+void Entity_has_wildcard_id(void);
+void Entity_has_wildcard_pair_id(void);
+void Entity_owns_id_t(void);
+void Entity_owns_pair_id_t(void);
+void Entity_owns_pair_id_t_w_type(void);
+void Entity_owns_id(void);
+void Entity_owns_pair_id(void);
+void Entity_owns_pair_id_w_type(void);
+void Entity_owns_wildcard_id(void);
+void Entity_owns_wildcard_pair(void);
+void Entity_id_from_world(void);
+void Entity_id_pair_from_world(void);
+void Entity_id_default_from_world(void);
 
 // Testsuite 'Pairs'
 void Pairs_add_component_pair(void);
@@ -1098,6 +1117,82 @@ bake_test_case Entity_testcases[] = {
     {
         "is_wildcard",
         Entity_is_wildcard
+    },
+    {
+        "has_id_t",
+        Entity_has_id_t
+    },
+    {
+        "has_pair_id_t",
+        Entity_has_pair_id_t
+    },
+    {
+        "has_pair_id_t_w_type",
+        Entity_has_pair_id_t_w_type
+    },
+    {
+        "has_id",
+        Entity_has_id
+    },
+    {
+        "has_pair_id",
+        Entity_has_pair_id
+    },
+    {
+        "has_pair_id_w_type",
+        Entity_has_pair_id_w_type
+    },
+    {
+        "has_wildcard_id",
+        Entity_has_wildcard_id
+    },
+    {
+        "has_wildcard_pair_id",
+        Entity_has_wildcard_pair_id
+    },
+    {
+        "owns_id_t",
+        Entity_owns_id_t
+    },
+    {
+        "owns_pair_id_t",
+        Entity_owns_pair_id_t
+    },
+    {
+        "owns_pair_id_t_w_type",
+        Entity_owns_pair_id_t_w_type
+    },
+    {
+        "owns_id",
+        Entity_owns_id
+    },
+    {
+        "owns_pair_id",
+        Entity_owns_pair_id
+    },
+    {
+        "owns_pair_id_w_type",
+        Entity_owns_pair_id_w_type
+    },
+    {
+        "owns_wildcard_id",
+        Entity_owns_wildcard_id
+    },
+    {
+        "owns_wildcard_pair",
+        Entity_owns_wildcard_pair
+    },
+    {
+        "id_from_world",
+        Entity_id_from_world
+    },
+    {
+        "id_pair_from_world",
+        Entity_id_pair_from_world
+    },
+    {
+        "id_default_from_world",
+        Entity_id_default_from_world
     }
 };
 
@@ -2779,7 +2874,7 @@ static bake_test_suite suites[] = {
         "Entity",
         NULL,
         NULL,
-        129,
+        148,
         Entity_testcases
     },
     {

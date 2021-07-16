@@ -157,11 +157,10 @@ void ecs_get_world_stats(
     /* Compute table statistics */
     int32_t empty_table_count = 0;
     int32_t singleton_table_count = 0;
-    int32_t matched_table_count = 0, matched_entity_count = 0;
 
     int32_t i, count = ecs_sparse_count(world->store.tables);
     for (i = 0; i < count; i ++) {
-        ecs_table_t *table = ecs_sparse_get(world->store.tables, ecs_table_t, i);
+        ecs_table_t *table = ecs_sparse_get_dense(world->store.tables, ecs_table_t, i);
         int32_t entity_count = ecs_table_count(table);
 
         if (!entity_count) {
@@ -177,19 +176,7 @@ void ecs_get_world_stats(
                 singleton_table_count ++;
             }
         }
-
-        /* If this table matches with queries and is not empty, increase the
-         * matched table & matched entity count. These statistics can be used to
-         * compute actual fragmentation ratio for queries. */
-        int32_t queries_matched = ecs_vector_count(table->queries);
-        if (queries_matched && entity_count) {
-            matched_table_count ++;
-            matched_entity_count += entity_count;
-        }
     }
-
-    record_gauge(&s->matched_table_count, t, matched_table_count);
-    record_gauge(&s->matched_entity_count, t, matched_entity_count);
     
     record_gauge(&s->table_count, t, count);
     record_gauge(&s->empty_table_count, t, empty_table_count);
@@ -209,12 +196,12 @@ void ecs_get_query_stats(
     int32_t t = s->t = t_next(s->t);
 
     int32_t i, entity_count = 0, count = ecs_vector_count(query->tables);
-    ecs_matched_table_t *matched_tables = ecs_vector_first(
-        query->tables, ecs_matched_table_t);
+    ecs_cached_table_t *matched_tables = ecs_vector_first(
+        query->tables, ecs_cached_table_t);
     for (i = 0; i < count; i ++) {
-        ecs_matched_table_t *matched = &matched_tables[i];
-        if (matched->iter_data.table) {
-            entity_count += ecs_table_count(matched->iter_data.table);
+        ecs_cached_table_t *matched = &matched_tables[i];
+        if (matched->table) {
+            entity_count += ecs_table_count(matched->table);
         }
     }
 

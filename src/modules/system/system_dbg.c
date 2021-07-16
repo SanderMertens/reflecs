@@ -21,8 +21,8 @@ int ecs_dbg_system(
     dbg_out->inactive_table_count = ecs_vector_count(system_data->query->empty_tables);
     dbg_out->enabled = !ecs_has_id(world, system, EcsDisabled);
 
-    ecs_vector_each(system_data->query->tables, ecs_matched_table_t, mt, {
-        ecs_table_t *table = mt->iter_data.table;
+    ecs_vector_each(system_data->query->tables, ecs_cached_table_t, mt, {
+        ecs_table_t *table = mt->table;
         if (table) {
             dbg_out->entities_matched_count += ecs_table_count(table);
         }        
@@ -50,8 +50,7 @@ bool ecs_dbg_match_entity(
         return false;
     }
 
-    return ecs_query_match(
-        world, dbg.table, system_data->query, failure_info_out);
+    return ecs_filter_match_entity(world, &system_data->query->filter, entity);
 }
 
 ecs_type_t ecs_dbg_get_column_type(

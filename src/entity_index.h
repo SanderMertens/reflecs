@@ -14,8 +14,8 @@
 extern "C" {
 #endif
 
-#define ecs_eis_get(world, entity) ecs_sparse_get_sparse((world->store).entity_index, ecs_record_t, entity)
-#define ecs_eis_get_any(world, entity) ecs_sparse_get_sparse_any((world->store).entity_index, ecs_record_t, entity)
+#define ecs_eis_get(world, entity) ecs_sparse_get((world->store).entity_index, ecs_record_t, entity)
+#define ecs_eis_get_any(world, entity) ecs_sparse_get_any((world->store).entity_index, ecs_record_t, entity)
 #define ecs_eis_set(world, entity, ...) (ecs_sparse_set((world->store).entity_index, ecs_record_t, entity, (__VA_ARGS__)))
 #define ecs_eis_ensure(world, entity) ecs_sparse_ensure((world->store).entity_index, ecs_record_t, entity)
 #define ecs_eis_delete(world, entity) ecs_sparse_remove((world->store).entity_index, entity)

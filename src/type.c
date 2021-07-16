@@ -261,6 +261,10 @@ int match_id(
         } else {
             return 0;
         }
+    } else {
+        if (match_with == EcsWildcard) {
+            return true;
+        }
     }
 
     if (ECS_HAS(id, match_with)) {
@@ -271,9 +275,10 @@ int match_id(
 }
 
 static
-bool search_type(
+int32_t search_type(
     const ecs_world_t *world,
     ecs_type_t type,
+    int32_t offset,
     ecs_entity_t id,
     ecs_entity_t rel,
     int32_t min_depth,
@@ -282,30 +287,31 @@ bool search_type(
     ecs_entity_t *out)
 {
     if (!type) {
-        return false;
+        return -1;
     }
 
     if (max_depth && depth > max_depth) {
-        return false;
+        return -1;
     }
 
     ecs_entity_t *ids = ecs_vector_first(type, ecs_entity_t);
     int32_t i, count = ecs_vector_count(type);
-    int matched = 0;
+    int matched = -1;
 
     if (id && depth >= min_depth) {
-        for (i = 0; i < count; i ++) {
+        for (i = offset; i < count; i ++) {
             int ret = match_id(world, type, ids[i], id);
             switch(ret) {
             case 0: break; /* no match, but keep looking */
-            case 1: return true; /* match found */
+            case 1: return i; /* match found */
             case -1: return false; /* no match found, stop looking */
-            case 2: matched ++; break; /* match found, but need to keep looking */
+            case 2: matched = i; break; /* match found, but need to keep looking */
             default: ecs_abort(ECS_INTERNAL_ERROR, NULL);
             }
         }
     }
 
+    /* If component hasn't been found yet, try substituting with relation */
     if (!matched && rel && id != EcsPrefab && id != EcsDisabled) {
         for (i = 0; i < count; i ++) {
             ecs_entity_t e = ids[i];
@@ -322,28 +328,30 @@ bool search_type(
             }
 
             ecs_type_t base_type = ecs_get_type(world, base);
-            if (!id || search_type(world, base_type, id, rel, 
-                min_depth, max_depth, depth + 1, out)) 
+            if (!id || search_type(world, base_type, 0, id, rel, 
+                min_depth, max_depth, depth + 1, out))
             {
                 if (out && !*out) {
                     *out = base;
                 }
-                return true;
+                return i;
 
             /* If the id could not be found on the base and the relationship is
              * not IsA, try substituting the base with IsA */
             } else if (rel != EcsIsA) {
-                if (search_type(world, base_type, id, EcsIsA, 1, 0, 0, out)) {
+                if (search_type(
+                    world, base_type, 0, id, EcsIsA, 1, 0, 0, out) != -1)
+                {
                     if (out && !*out) {
                         *out = base;
                     }
-                    return true;
+                    return i;
                 }
             }
         }
     }
 
-    return matched != 0;
+    return matched;
 }
 
 bool ecs_type_has_id(
@@ -351,7 +359,7 @@ bool ecs_type_has_id(
     ecs_type_t type,
     ecs_entity_t entity)
 {
-    return search_type(world, type, entity, EcsIsA, 0, 0, 0, NULL);
+    return search_type(world, type, 0, entity, EcsIsA, 0, 0, 0, NULL) != -1;
 }
 
 bool ecs_type_owns_id(
@@ -360,12 +368,14 @@ bool ecs_type_owns_id(
     ecs_entity_t entity,
     bool owned)
 {
-    return search_type(world, type, entity, owned ? 0 : EcsIsA, 0, 0, 0, NULL);
+    return search_type(
+        world, type, 0, entity, owned ? 0 : EcsIsA, 0, 0, 0, NULL) != -1;
 }
 
-bool ecs_type_find_id(
+int32_t ecs_type_find_id(
     const ecs_world_t *world,
     ecs_type_t type,
+    int32_t offset,
     ecs_entity_t id,
     ecs_entity_t rel,
     int32_t min_depth,
@@ -375,7 +385,7 @@ bool ecs_type_find_id(
     if (out) {
         *out = 0;
     }
-    return search_type(world, type, id, rel, min_depth, max_depth, 0, out);
+    return search_type(world, type, offset, id, rel, min_depth, max_depth, 0, out);
 }
 
 bool ecs_type_has_type(

@@ -137,13 +137,13 @@ uint64_t ecs_sparse_get_current(
 /** Get value from sparse set by dense id. This function is useful in 
  * combination with ecs_sparse_count for iterating all values in the set. */
 FLECS_DBG_API
-void* _ecs_sparse_get(
+void* _ecs_sparse_get_dense(
     const ecs_sparse_t *sparse,
     ecs_size_t elem_size,
     int32_t index);
 
-#define ecs_sparse_get(sparse, type, index)\
-    ((type*)_ecs_sparse_get(sparse, sizeof(type), index))
+#define ecs_sparse_get_dense(sparse, type, index)\
+    ((type*)_ecs_sparse_get_dense(sparse, sizeof(type), index))
 
 /** Get the number of alive elements in the sparse set. */
 FLECS_DBG_API
@@ -158,23 +158,23 @@ int32_t ecs_sparse_size(
 /** Get element by (sparse) id. The returned pointer is stable for the duration
  * of the sparse set, as it is stored in the sparse array. */
 FLECS_DBG_API
-void* _ecs_sparse_get_sparse(
+void* _ecs_sparse_get(
     const ecs_sparse_t *sparse,
     ecs_size_t elem_size,
     uint64_t index);
 
-#define ecs_sparse_get_sparse(sparse, type, index)\
-    ((type*)_ecs_sparse_get_sparse(sparse, sizeof(type), index))
+#define ecs_sparse_get(sparse, type, index)\
+    ((type*)_ecs_sparse_get(sparse, sizeof(type), index))
 
 /** Like get_sparse, but don't care whether element is alive or not. */
 FLECS_DBG_API
-void* _ecs_sparse_get_sparse_any(
+void* _ecs_sparse_get_any(
     ecs_sparse_t *sparse,
     ecs_size_t elem_size,
     uint64_t index);
 
-#define ecs_sparse_get_sparse_any(sparse, type, index)\
-    ((type*)_ecs_sparse_get_sparse_any(sparse, sizeof(type), index))
+#define ecs_sparse_get_any(sparse, type, index)\
+    ((type*)_ecs_sparse_get_any(sparse, sizeof(type), index))
 
 /** Get or create element by (sparse) id. */
 FLECS_DBG_API
@@ -226,12 +226,20 @@ void ecs_sparse_memory(
     int32_t *allocd,
     int32_t *used);
 
+FLECS_DBG_API
+ecs_sparse_iter_t _ecs_sparse_iter(
+    ecs_sparse_t *sparse,
+    ecs_size_t elem_size);
+
+#define ecs_sparse_iter(sparse, T)\
+    _ecs_sparse_iter(sparse, ECS_SIZEOF(T))
+
 #ifndef FLECS_LEGACY
 #define ecs_sparse_each(sparse, T, var, ...)\
     {\
         int var##_i, var##_count = ecs_sparse_count(sparse);\
         for (var##_i = 0; var##_i < var##_count; var##_i ++) {\
-            T* var = ecs_sparse_get(sparse, T, var##_i);\
+            T* var = ecs_sparse_get_dense(sparse, T, var##_i);\
             __VA_ARGS__\
         }\
     }

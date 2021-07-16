@@ -27,7 +27,7 @@ void Sparse_add_1() {
     test_assert(elem != NULL);
     test_int(ecs_sparse_count(sp), 1);
     
-    int *ptr = ecs_sparse_get(sp, int, 0);
+    int *ptr = ecs_sparse_get_dense(sp, int, 0);
     test_assert(ptr != NULL);
     test_assert(elem == ptr);
 
@@ -43,7 +43,7 @@ void Sparse_add_1_to_empty() {
     test_assert(elem != NULL);
     test_int(ecs_sparse_count(sp), 1);
     
-    int *ptr = ecs_sparse_get(sp, int, 0);
+    int *ptr = ecs_sparse_get_dense(sp, int, 0);
     test_assert(ptr != NULL);
     test_assert(elem == ptr);
 
@@ -59,7 +59,7 @@ void Sparse_add_1_chunk_size_1() {
     test_assert(elem != NULL);
     test_int(ecs_sparse_count(sp), 1);
     
-    int *ptr = ecs_sparse_get(sp, int, 0);
+    int *ptr = ecs_sparse_get_dense(sp, int, 0);
     test_assert(ptr != NULL);
     test_assert(elem == ptr);
 
@@ -79,11 +79,11 @@ void Sparse_add_n() {
     test_assert(elem2 != NULL);
     test_int(ecs_sparse_count(sp), 2);    
     
-    int *ptr = ecs_sparse_get(sp, int, 0);
+    int *ptr = ecs_sparse_get_dense(sp, int, 0);
     test_assert(ptr != NULL);
     test_assert(elem1 == ptr);
 
-    ptr = ecs_sparse_get(sp, int, 1);
+    ptr = ecs_sparse_get_dense(sp, int, 1);
     test_assert(ptr != NULL);
     test_assert(elem2 == ptr);
 
@@ -103,11 +103,11 @@ void Sparse_add_n_chunk_size_1() {
     test_assert(elem2 != NULL);
     test_int(ecs_sparse_count(sp), 2);    
     
-    int *ptr = ecs_sparse_get(sp, int, 0);
+    int *ptr = ecs_sparse_get_dense(sp, int, 0);
     test_assert(ptr != NULL);
     test_assert(elem1 == ptr);
 
-    ptr = ecs_sparse_get(sp, int, 1);
+    ptr = ecs_sparse_get_dense(sp, int, 1);
     test_assert(ptr != NULL);
     test_assert(elem2 == ptr);
 
@@ -128,8 +128,8 @@ void Sparse_remove() {
     ecs_sparse_remove(sp, 1);
     test_int(ecs_sparse_count(sp), 2);
 
-    test_assert(ecs_sparse_get(sp, int, 0) == ecs_sparse_get_sparse(sp, int, i0));
-    test_assert(ecs_sparse_get(sp, int, 1) == ecs_sparse_get_sparse(sp, int, i1));
+    test_assert(ecs_sparse_get_dense(sp, int, 0) == ecs_sparse_get(sp, int, i0));
+    test_assert(ecs_sparse_get_dense(sp, int, 1) == ecs_sparse_get(sp, int, i1));
 
     ecs_sparse_free(sp);
 }
@@ -148,8 +148,8 @@ void Sparse_remove_first() {
     ecs_sparse_remove(sp, 0);
     test_int(ecs_sparse_count(sp), 2);
 
-    test_assert(ecs_sparse_get(sp, int, 0) == ecs_sparse_get_sparse(sp, int, i1));
-    test_assert(ecs_sparse_get(sp, int, 1) == ecs_sparse_get_sparse(sp, int, i0));
+    test_assert(ecs_sparse_get_dense(sp, int, 0) == ecs_sparse_get(sp, int, i1));
+    test_assert(ecs_sparse_get_dense(sp, int, 1) == ecs_sparse_get(sp, int, i0));
 
     ecs_sparse_free(sp);
 }
@@ -168,8 +168,8 @@ void Sparse_remove_last() {
     ecs_sparse_remove(sp, 2);
     test_int(ecs_sparse_count(sp), 2);
 
-    test_assert(ecs_sparse_get(sp, int, 0) == ecs_sparse_get_sparse(sp, int, i0));
-    test_assert(ecs_sparse_get(sp, int, 1) == ecs_sparse_get_sparse(sp, int, i1));
+    test_assert(ecs_sparse_get_dense(sp, int, 0) == ecs_sparse_get(sp, int, i0));
+    test_assert(ecs_sparse_get_dense(sp, int, 1) == ecs_sparse_get(sp, int, i1));
 
     ecs_sparse_free(sp);
 }
@@ -181,26 +181,26 @@ void Sparse_remove_all() {
 
     populate(sp, 3);
 
-    void *elem2 = ecs_sparse_get(sp, int, 1);
-    void *elem3 = ecs_sparse_get(sp, int, 2);
+    void *elem2 = ecs_sparse_get_dense(sp, int, 1);
+    void *elem3 = ecs_sparse_get_dense(sp, int, 2);
 
     ecs_sparse_remove(sp, 0);
     test_int(ecs_sparse_count(sp), 2);
-    test_assert(ecs_sparse_get_sparse(sp, int, 0) == NULL);
-    test_assert(ecs_sparse_get_sparse(sp, int, 1) == elem2);
-    test_assert(ecs_sparse_get_sparse(sp, int, 2) == elem3);
+    test_assert(ecs_sparse_get(sp, int, 0) == NULL);
+    test_assert(ecs_sparse_get(sp, int, 1) == elem2);
+    test_assert(ecs_sparse_get(sp, int, 2) == elem3);
 
     ecs_sparse_remove(sp, 1);
     test_int(ecs_sparse_count(sp), 1);
-    test_assert(ecs_sparse_get_sparse(sp, int, 0) == NULL);
-    test_assert(ecs_sparse_get_sparse(sp, int, 1) == NULL);
-    test_assert(ecs_sparse_get_sparse(sp, int, 2) == elem3);    
+    test_assert(ecs_sparse_get(sp, int, 0) == NULL);
+    test_assert(ecs_sparse_get(sp, int, 1) == NULL);
+    test_assert(ecs_sparse_get(sp, int, 2) == elem3);    
 
     ecs_sparse_remove(sp, 2);
     test_int(ecs_sparse_count(sp), 0);
-    test_assert(ecs_sparse_get_sparse(sp, int, 0) == NULL);
-    test_assert(ecs_sparse_get_sparse(sp, int, 1) == NULL);
-    test_assert(ecs_sparse_get_sparse(sp, int, 2) == NULL);    
+    test_assert(ecs_sparse_get(sp, int, 0) == NULL);
+    test_assert(ecs_sparse_get(sp, int, 1) == NULL);
+    test_assert(ecs_sparse_get(sp, int, 2) == NULL);    
 
     ecs_sparse_free(sp);
 }
@@ -292,7 +292,7 @@ void Sparse_copy() {
 
     int i;
     for (i = 0; i < 128; i ++) {
-        test_int(*ecs_sparse_get_sparse(sp2, int, i), i);
+        test_int(*ecs_sparse_get(sp2, int, i), i);
     }
 
     ecs_sparse_free(sp2);
@@ -317,7 +317,7 @@ void Sparse_restore() {
 
     int i;
     for (i = 0; i < 128; i ++) {
-        test_int(*ecs_sparse_get_sparse(sp, int, i), i);
+        test_int(*ecs_sparse_get(sp, int, i), i);
     }
 
     ecs_sparse_free(sp);
@@ -341,7 +341,7 @@ void Sparse_add_after_clear() {
     const uint64_t *indices = ecs_sparse_ids(sp);
     test_assert(indices != NULL);
 
-    int *ptr = ecs_sparse_get_sparse(sp, int, indices[0]);
+    int *ptr = ecs_sparse_get(sp, int, indices[0]);
     test_assert(ptr != NULL);
     test_assert(ptr == elem);
     test_int(*ptr, 10);

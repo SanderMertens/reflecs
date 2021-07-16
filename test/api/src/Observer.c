@@ -10,7 +10,7 @@ void Observer_w_value(ecs_iter_t *it) {
     probe_system_w_ctx(it, it->ctx);
 
     test_int(it->count, 1);
-    test_int(it->column_count, 2);
+    test_int(it->term_count, 2);
     test_assert(it->entities != NULL);
     test_assert(it->entities[0] != 0);
 

@@ -32,6 +32,7 @@ ecs_entity_t ecs_import(
     void *handles_out,
     size_t handles_size)
 {
+    ecs_object_assert(world, ecs_world_t);
     ecs_assert(!world->is_readonly, ECS_INVALID_WHILE_ITERATING, NULL);
 
     ecs_entity_t old_scope = ecs_set_scope(world, 0);
@@ -73,6 +74,7 @@ ecs_entity_t ecs_import_from_library(
     const char *library_name,
     const char *module_name)
 {
+    ecs_object_assert(world, ecs_world_t);
     ecs_assert(library_name != NULL, ECS_INVALID_PARAMETER, NULL);
 
     char *import_func = (char*)module_name; /* safe */
@@ -179,7 +181,7 @@ void ecs_add_module_tag(
     ecs_world_t *world,
     ecs_entity_t module)
 {
-    ecs_assert(world != NULL, ECS_INVALID_PARAMETER, NULL);
+    ecs_object_assert(world, ecs_world_t);
     ecs_assert(module != 0, ECS_INVALID_PARAMETER, NULL);
 
     ecs_entity_t e = module;
@@ -205,8 +207,7 @@ ecs_entity_t ecs_new_module(
     size_t size,
     size_t alignment)
 {
-    ecs_assert(world != NULL, ECS_INVALID_PARAMETER, NULL);
-    ecs_assert(world->magic == ECS_WORLD_MAGIC, ECS_INVALID_PARAMETER, NULL);
+    ecs_object_assert(world, ecs_world_t);
 
     if (!e) {
         char *module_path = ecs_module_path_from_c(name);

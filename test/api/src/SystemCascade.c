@@ -42,7 +42,7 @@ void SystemCascade_cascade_depth_1() {
     ecs_add_pair(world, e4, EcsChildOf, e2);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -110,7 +110,7 @@ void SystemCascade_cascade_depth_2() {
     ecs_add_pair(world, e6, EcsChildOf, e4); /* depth 2 */
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -277,7 +277,7 @@ void SystemCascade_add_after_match() {
     ecs_add_pair(world, e4, EcsChildOf, parent); /* depth 1 */
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 
@@ -347,7 +347,7 @@ void SystemCascade_adopt_after_match() {
     ecs_set(world, e4, Position, {1, 2});
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_progress(world, 1);
 

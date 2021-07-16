@@ -7,7 +7,7 @@ void OnPosition(ecs_iter_t *it) {
 
 static
 void Add_to_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
 
     int i;
     for (i = 0; i < it->count; i ++) {
@@ -27,7 +27,7 @@ void Add_to_current(ecs_iter_t *it) {
 
 static
 void Remove_from_current(ecs_iter_t *it) {
-    IterData *ctx = ecs_get_context(it->world);
+    IterData *ctx = ecs_get_ctx(it->world);
 
     int i;
     for (i = 0; i < it->count; i ++) {
@@ -69,7 +69,7 @@ void SystemOnSet_set_1_of_1() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -118,7 +118,7 @@ void SystemOnSet_set_1_of_2() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -175,7 +175,7 @@ void SystemOnSet_set_1_of_3() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position, Velocity, Mass);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -255,7 +255,7 @@ void SystemOnSet_bulk_new_1() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new_w_data(world, 3,
         &(ecs_ids_t){
@@ -294,7 +294,7 @@ void SystemOnSet_bulk_new_2() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new_w_data(world, 3,
         &(ecs_ids_t){
@@ -343,7 +343,7 @@ void SystemOnSet_bulk_new_2_of_1() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new_w_data(world, 3,
         &(ecs_ids_t){
@@ -391,7 +391,7 @@ void SystemOnSet_bulk_new_3() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position, Velocity, Mass);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new_w_data(world, 3,
         &(ecs_ids_t){
@@ -449,7 +449,7 @@ void SystemOnSet_bulk_new_3_of_2() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new_w_data(world, 3,
         &(ecs_ids_t){
@@ -506,7 +506,7 @@ void SystemOnSet_bulk_new_1_from_base() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, ANY:Position, Velocity, Mass);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new_w_data(world, 3,
         &(ecs_ids_t){
@@ -558,7 +558,7 @@ void SystemOnSet_set_1_of_2_1_from_base() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, ANY:Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new_w_pair(world, EcsIsA, Base);
     test_int(ctx.invoked, 0);
@@ -595,7 +595,7 @@ void SystemOnSet_set_1_of_3_1_from_base() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, ANY:Position, Velocity, Mass);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new_w_pair(world, EcsIsA, Base);
     test_int(ctx.invoked, 0);
@@ -653,7 +653,7 @@ void SystemOnSet_add_base() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, ANY:Position, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Velocity);
     test_int(ctx.invoked, 0);
@@ -682,7 +682,7 @@ void SystemOnSet_add_base_to_1_overridden() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, ANY:Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -702,7 +702,7 @@ void SystemOnSet_add_base_to_2_overridden() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, ANY:Position, ANY:Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     ecs_add(world, e, Velocity);
@@ -723,7 +723,7 @@ void SystemOnSet_add_base_to_1_of_2_overridden() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, ANY:Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Velocity);
     test_int(ctx.invoked, 0);
@@ -759,7 +759,7 @@ void SystemOnSet_on_set_after_remove_override() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -790,7 +790,7 @@ void SystemOnSet_no_set_after_remove_base() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, ANY:Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -811,7 +811,7 @@ void SystemOnSet_un_set_after_remove() {
     ECS_SYSTEM(world, OnPosition, EcsUnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -830,7 +830,7 @@ void SystemOnSet_un_set_after_remove_base() {
     ECS_SYSTEM(world, OnPosition, EcsUnSet, ANY:Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, 0);
     test_int(ctx.invoked, 0);
@@ -852,7 +852,7 @@ void SystemOnSet_add_to_current_in_on_set() {
     ECS_SYSTEM(world, Add_to_current, EcsOnSet, Position);
 
     IterData ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_set(world, 0, Position, {10, 20});
@@ -891,7 +891,7 @@ void SystemOnSet_remove_from_current_in_on_set() {
     ECS_SYSTEM(world, Remove_from_current, EcsOnSet, Position);
 
     IterData ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, Type);
@@ -934,7 +934,7 @@ void SystemOnSet_remove_set_component_in_on_set() {
     ECS_SYSTEM(world, Remove_from_current, EcsOnSet, Position);
 
     IterData ctx = {.component = ecs_typeid(Position)};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     /* Create entities from scratch so they don't have the EcsName component */
     ecs_entity_t e1 = ecs_new(world, Type);
@@ -967,7 +967,7 @@ void SystemOnSet_match_table_created_w_add_in_on_set() {
     ECS_SYSTEM(world, On_PV, EcsOnUpdate, Position, Velocity);
 
     IterData add_ctx = {.component = ecs_typeid(Velocity)};
-    ecs_set_context(world, &add_ctx);
+    ecs_set_ctx(world, &add_ctx);
 
     ecs_entity_t e1 = ecs_set(world, 0, Position, {10, 20});
     ecs_entity_t e2 = ecs_set(world, 0, Position, {10, 20});
@@ -1000,7 +1000,7 @@ void SystemOnSet_set_optional() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position, ?Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_new(world, Position);
     test_int(ctx.invoked, 0);
@@ -1042,7 +1042,7 @@ void SystemOnSet_set_from_nothing() {
     ECS_SYSTEM(world, OnPosition, EcsOnSet, Position, :Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_set(world, 0, Position, {10, 20});
     test_int(ctx.invoked, 1);
@@ -1082,7 +1082,7 @@ void SystemOnSet_add_null_type_in_on_set() {
     ECS_SYSTEM(world, AddNull, EcsOnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_set(world, 0, Position, {10, 20});
     test_int(ctx.invoked, 1);
@@ -1120,7 +1120,7 @@ void SystemOnSet_add_0_entity_in_on_set() {
     ECS_SYSTEM(world, Add0, EcsOnSet, Position);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     test_expect_abort();
     ecs_set(world, 0, Position, {10, 20});

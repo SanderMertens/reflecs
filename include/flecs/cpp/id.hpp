@@ -7,15 +7,11 @@ namespace flecs {
  */
 class id : public world_base<id> {
 public:
-    explicit id() 
-        : m_world(nullptr)
-        , m_id(0) { }
-
-    explicit id(flecs::id_t value) 
+    explicit id(flecs::id_t value = 0) 
         : m_world(nullptr)
         , m_id(value) { }
 
-    explicit id(flecs::world_t *world, flecs::id_t value) 
+    explicit id(flecs::world_t *world, flecs::id_t value = 0)
         : m_world(world)
         , m_id(value) { }
 

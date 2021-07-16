@@ -14,7 +14,7 @@ bool iter_table(
     bool table_found = false;
 
     while (next(it)) {
-        ecs_table_t *table = it->table->table;
+        ecs_table_t *table = it->table;
 
         reader->table = table;
         ecs_assert(table != NULL, ECS_INTERNAL_ERROR, NULL);

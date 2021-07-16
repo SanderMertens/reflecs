@@ -28,7 +28,7 @@ void World_progress_w_0() {
     ECS_SYSTEM(world, Move, EcsOnUpdate, Position, Velocity);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_set(world, e1, Position, {0, 0});
     ecs_set(world, e1, Velocity, {1, 2});
@@ -66,7 +66,7 @@ void World_progress_w_t() {
     ECS_SYSTEM(world, Move, EcsOnUpdate, Position, Velocity);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_set(world, e1, Position, {0, 0});
     ecs_set(world, e1, Velocity, {1, 2});

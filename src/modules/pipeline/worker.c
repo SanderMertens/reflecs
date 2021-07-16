@@ -52,8 +52,7 @@ void start_workers(
     int32_t i;
     for (i = 0; i < threads; i ++) {
         ecs_stage_t *stage = (ecs_stage_t*)ecs_get_stage(world, i);
-        ecs_assert(stage != NULL, ECS_INTERNAL_ERROR, NULL);
-        ecs_assert(stage->magic == ECS_STAGE_MAGIC, ECS_INTERNAL_ERROR, NULL);
+        ecs_object_assert(stage, ecs_stage_t);
 
         ecs_vector_get(world->worker_stages, ecs_stage_t, i);
         stage->thread = ecs_os_thread_new(worker, stage);
@@ -232,7 +231,7 @@ void ecs_workers_progress(
     ecs_entity_t pipeline,
     FLECS_FLOAT delta_time)
 {
-    ecs_assert(world->magic == ECS_WORLD_MAGIC, ECS_INTERNAL_ERROR, NULL);
+    ecs_object_assert(world, ecs_world_t);
     int32_t stage_count = ecs_get_stage_count(world);
 
     ecs_time_t start = {0};

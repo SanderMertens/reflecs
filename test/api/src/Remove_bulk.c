@@ -287,7 +287,7 @@ void Remove_bulk_on_remove() {
     ECS_TRIGGER(world, RemoveVelocity, EcsOnRemove, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new(world, Type, 10);
     test_assert(ids != NULL);
@@ -396,7 +396,7 @@ void Remove_bulk_remove_entity_on_remove() {
     ECS_TRIGGER(world, RemoveVelocity, EcsOnRemove, Velocity);
 
     Probe ctx = { 0 };
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     const ecs_entity_t *ids = ecs_bulk_new(world, Type, 10);
     test_assert(ids != NULL);

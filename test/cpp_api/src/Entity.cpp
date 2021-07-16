@@ -2446,3 +2446,369 @@ void Entity_is_wildcard() {
     test_bool(p3.is_wildcard(), true);
     test_bool(p4.is_wildcard(), true);   
 }
+
+void Entity_has_id_t() {
+    flecs::world ecs;
+
+    flecs::id_t id_1 = ecs.entity();
+    test_assert(id_1 != 0);
+
+    flecs::id_t id_2 = ecs.entity();
+    test_assert(id_2 != 0);    
+
+    auto e = ecs.entity()
+        .add(id_1);
+
+    test_assert(e != 0);
+    test_bool(e.has(id_1), true);
+    test_bool(e.has(id_2), false);
+}
+
+void Entity_has_pair_id_t() {
+    flecs::world ecs;
+
+    flecs::id_t id_1 = ecs.entity();
+    test_assert(id_1 != 0);
+
+    flecs::id_t id_2 = ecs.entity();
+    test_assert(id_2 != 0);  
+
+    flecs::id_t id_3 = ecs.entity();
+    test_assert(id_3 != 0);
+
+    auto e = ecs.entity()
+        .add(id_1, id_2);
+
+    test_assert(e != 0);
+    test_bool(e.has(id_1, id_2), true);
+    test_bool(e.has(id_1, id_3), false);
+}
+
+void Entity_has_pair_id_t_w_type() {
+    flecs::world ecs;
+
+    struct Rel { };
+
+    flecs::id_t id_2 = ecs.entity();
+    test_assert(id_2 != 0);  
+
+    flecs::id_t id_3 = ecs.entity();
+    test_assert(id_3 != 0);
+
+    auto e = ecs.entity()
+        .add<Rel>(id_2);
+
+    test_assert(e != 0);
+    test_bool(e.has<Rel>(id_2), true);
+    test_bool(e.has<Rel>(id_3), false);
+}
+
+void Entity_has_id() {
+    flecs::world ecs;
+
+    flecs::id id_1 = ecs.entity();
+    test_assert(id_1 != 0);
+
+    flecs::id id_2 = ecs.entity();
+    test_assert(id_2 != 0);    
+
+    auto e = ecs.entity()
+        .add(id_1);
+
+    test_assert(e != 0);
+    test_bool(e.has(id_1), true);
+    test_bool(e.has(id_2), false);
+}
+
+void Entity_has_pair_id() {
+    flecs::world ecs;
+
+    flecs::id id_1 = ecs.entity();
+    test_assert(id_1 != 0);
+
+    flecs::id id_2 = ecs.entity();
+    test_assert(id_2 != 0);  
+
+    flecs::id id_3 = ecs.entity();
+    test_assert(id_3 != 0);
+
+    auto e = ecs.entity()
+        .add(id_1, id_2);
+
+    test_assert(e != 0);
+    test_bool(e.has(id_1, id_2), true);
+    test_bool(e.has(id_1, id_3), false);
+}
+
+void Entity_has_pair_id_w_type() {
+    flecs::world ecs;
+
+    struct Rel { };
+
+    flecs::id id_2 = ecs.entity();
+    test_assert(id_2 != 0);  
+
+    flecs::id id_3 = ecs.entity();
+    test_assert(id_3 != 0);
+
+    auto e = ecs.entity()
+        .add<Rel>(id_2);
+
+    test_assert(e != 0);
+    test_bool(e.has<Rel>(id_2), true);
+    test_bool(e.has<Rel>(id_3), false);
+}
+
+void Entity_has_wildcard_id() {
+    flecs::world ecs;
+
+    flecs::id id = ecs.entity();
+    test_assert(id != 0);
+
+    auto e1 = ecs.entity().add(id);
+    auto e2 = ecs.entity();
+
+    test_assert(e1 != 0);
+    test_assert(e2 != 0);
+
+    test_bool(e1.has(flecs::Wildcard), true);
+    test_bool(e2.has(flecs::Wildcard), false);
+}
+
+void Entity_has_wildcard_pair_id() {
+    flecs::world ecs;
+
+    flecs::id rel = ecs.entity();
+    test_assert(rel != 0);
+
+    flecs::id obj = ecs.entity();
+    test_assert(obj != 0);
+
+    flecs::id obj_2 = ecs.entity();
+    test_assert(obj_2 != 0);
+
+    flecs::id w1 = ecs.id(rel, flecs::Wildcard);
+    flecs::id w2 = ecs.id(flecs::Wildcard, obj);
+
+    auto e1 = ecs.entity().add(rel, obj);
+    auto e2 = ecs.entity().add(rel, obj_2);
+
+    test_assert(e1 != 0);
+    test_assert(e2 != 0);
+
+    test_bool(e1.has(w1), true);
+    test_bool(e1.has(w2), true);
+
+    test_bool(e2.has(w1), true);
+    test_bool(e2.has(w2), false);
+}
+
+void Entity_owns_id_t() {
+    flecs::world ecs;
+
+    flecs::id_t id_1 = ecs.entity();
+    test_assert(id_1 != 0);
+
+    flecs::id_t id_2 = ecs.entity();
+    test_assert(id_2 != 0);    
+
+    auto e = ecs.entity()
+        .add(id_1);
+
+    test_assert(e != 0);
+    test_bool(e.owns(id_1), true);
+    test_bool(e.owns(id_2), false);
+}
+
+void Entity_owns_pair_id_t() {
+    flecs::world ecs;
+
+    flecs::id_t id_1 = ecs.entity();
+    test_assert(id_1 != 0);
+
+    flecs::id_t id_2 = ecs.entity();
+    test_assert(id_2 != 0);  
+
+    flecs::id_t id_3 = ecs.entity();
+    test_assert(id_3 != 0);
+
+    auto e = ecs.entity()
+        .add(id_1, id_2);
+
+    test_assert(e != 0);
+    test_bool(e.owns(id_1, id_2), true);
+    test_bool(e.owns(id_1, id_3), false);
+}
+
+void Entity_owns_pair_id_t_w_type() {
+    flecs::world ecs;
+
+    struct Rel { };
+
+    flecs::id_t id_2 = ecs.entity();
+    test_assert(id_2 != 0);  
+
+    flecs::id_t id_3 = ecs.entity();
+    test_assert(id_3 != 0);
+
+    auto e = ecs.entity()
+        .add<Rel>(id_2);
+
+    test_assert(e != 0);
+    test_bool(e.owns<Rel>(id_2), true);
+    test_bool(e.owns<Rel>(id_3), false);
+}
+
+void Entity_owns_id() {
+    flecs::world ecs;
+
+    flecs::id id_1 = ecs.entity();
+    test_assert(id_1 != 0);
+
+    flecs::id id_2 = ecs.entity();
+    test_assert(id_2 != 0);    
+
+    auto e = ecs.entity()
+        .add(id_1);
+
+    test_assert(e != 0);
+    test_bool(e.owns(id_1), true);
+    test_bool(e.owns(id_2), false);
+}
+
+void Entity_owns_pair_id() {
+    flecs::world ecs;
+
+    flecs::id id_1 = ecs.entity();
+    test_assert(id_1 != 0);
+
+    flecs::id id_2 = ecs.entity();
+    test_assert(id_2 != 0);  
+
+    flecs::id id_3 = ecs.entity();
+    test_assert(id_3 != 0);
+
+    auto e = ecs.entity()
+        .add(id_1, id_2);
+
+    test_assert(e != 0);
+    test_bool(e.owns(id_1, id_2), true);
+    test_bool(e.owns(id_1, id_3), false);
+}
+
+void Entity_owns_wildcard_id() {
+    flecs::world ecs;
+
+    flecs::id id = ecs.entity();
+    test_assert(id != 0);
+
+    auto e1 = ecs.entity().add(id);
+    auto e2 = ecs.entity();
+
+    test_assert(e1 != 0);
+    test_assert(e2 != 0);
+
+    test_bool(e1.owns(flecs::Wildcard), true);
+    test_bool(e2.owns(flecs::Wildcard), false);
+}
+
+void Entity_owns_wildcard_pair() {
+    flecs::world ecs;
+
+    flecs::id rel = ecs.entity();
+    test_assert(rel != 0);
+
+    flecs::id obj = ecs.entity();
+    test_assert(obj != 0);
+
+    flecs::id obj_2 = ecs.entity();
+    test_assert(obj_2 != 0);
+
+    flecs::id w1 = ecs.id(rel, flecs::Wildcard);
+    flecs::id w2 = ecs.id(flecs::Wildcard, obj);
+
+    auto e1 = ecs.entity().add(rel, obj);
+    auto e2 = ecs.entity().add(rel, obj_2);
+
+    test_assert(e1 != 0);
+    test_assert(e2 != 0);
+
+    test_bool(e1.owns(w1), true);
+    test_bool(e1.owns(w2), true);
+
+    test_bool(e2.owns(w1), true);
+    test_bool(e2.owns(w2), false);
+}
+
+void Entity_owns_pair_id_w_type() {
+    flecs::world ecs;
+
+    struct Rel { };
+
+    flecs::id id_2 = ecs.entity();
+    test_assert(id_2 != 0);  
+
+    flecs::id id_3 = ecs.entity();
+    test_assert(id_3 != 0);
+
+    auto e = ecs.entity()
+        .add<Rel>(id_2);
+
+    test_assert(e != 0);
+    test_bool(e.owns<Rel>(id_2), true);
+    test_bool(e.owns<Rel>(id_3), false);
+}
+
+void Entity_id_from_world() {
+    flecs::world ecs;
+
+    auto e = ecs.entity();
+    test_assert(e != 0);
+
+    flecs::id id_1 = ecs.id(e);
+    test_assert(id_1 != 0);
+    test_assert(id_1 == e);
+    test_assert(id_1.world() == ecs);
+    test_bool(id_1.is_pair(), false);
+    test_bool(id_1.is_wildcard(), false);
+
+    flecs::id id_2 = ecs.id(flecs::Wildcard);
+    test_assert(id_2 != 0);
+    test_assert(id_2 == flecs::Wildcard);
+    test_assert(id_2.world() == ecs);
+    test_bool(id_2.is_pair(), false);
+    test_bool(id_2.is_wildcard(), true);
+}
+
+void Entity_id_pair_from_world() {
+    flecs::world ecs;
+
+    auto rel = ecs.entity();
+    test_assert(rel != 0);
+
+    auto obj = ecs.entity();
+    test_assert(obj != 0);    
+
+    flecs::id id_1 = ecs.id(rel, obj);
+    test_assert(id_1 != 0);
+    test_assert(id_1.relation() == rel);
+    test_assert(id_1.object() == obj);
+    test_assert(id_1.world() == ecs);
+    test_bool(id_1.is_pair(), true);
+    test_bool(id_1.is_wildcard(), false);
+
+    flecs::id id_2 = ecs.id(rel, flecs::Wildcard);
+    test_assert(id_2 != 0);
+    test_assert(id_2.relation() == rel);
+    test_assert(id_2.object() == flecs::Wildcard);
+    test_assert(id_2.world() == ecs);
+    test_bool(id_2.is_pair(), true);
+    test_bool(id_2.is_wildcard(), true);
+}
+
+void Entity_id_default_from_world() {
+    flecs::world ecs;
+
+    flecs::id id_default = ecs.id();
+    test_assert(id_default == 0);
+}

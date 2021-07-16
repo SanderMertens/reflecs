@@ -179,8 +179,7 @@ void ecs_dim_type(
     ecs_type_t type,
     int32_t entity_count)
 {
-    ecs_assert(world != NULL, ECS_INVALID_PARAMETER, NULL);
-    ecs_assert(world->magic == ECS_WORLD_MAGIC, ECS_INVALID_PARAMETER, NULL);
+    ecs_object_assert(world, ecs_world_t);
     if (type) {
         ecs_table_t *table = ecs_table_from_type(world, type);
         ecs_assert(table != NULL, ECS_INTERNAL_ERROR, NULL);
@@ -225,27 +224,27 @@ ecs_type_t ecs_column_type(
     const ecs_iter_t *it,
     int32_t index)
 {
-    ecs_assert(index <= it->column_count, ECS_INVALID_PARAMETER, NULL);
+    ecs_assert(index <= it->term_count, ECS_INVALID_PARAMETER, NULL);
     ecs_assert(index > 0, ECS_INVALID_PARAMETER, NULL);
     ecs_assert(it->table != NULL, ECS_INTERNAL_ERROR, NULL);
-    ecs_assert(it->table->types != NULL, ECS_INTERNAL_ERROR, NULL);
-    return it->table->types[index - 1];
+    ecs_assert(it->types != NULL, ECS_INTERNAL_ERROR, NULL);
+    return it->types[index - 1];
 }
 
 int32_t ecs_column_index_from_name(
     const ecs_iter_t *it,
     const char *name)
 {
-    if (it->query) {
-        ecs_term_t *terms = it->query->filter.terms;
-        int32_t i, count = it->query->filter.term_count;
+    ecs_assert(it->terms != NULL, ECS_INVALID_PARAMETER, NULL);
 
-        for (i = 0; i < count; i ++) {
-            ecs_term_t *term = &terms[i];
-            if (term->name) {
-                if (!strcmp(name, term->name)) {
-                    return i + 1;
-                }
+    ecs_term_t *terms = it->terms;
+    int32_t i, count = it->term_count;
+
+    for (i = 0; i < count; i ++) {
+        ecs_term_t *term = &terms[i];
+        if (term->name) {
+            if (!strcmp(name, term->name)) {
+                return i + 1;
             }
         }
     }
@@ -279,7 +278,7 @@ ecs_entity_t ecs_column_source(
     const ecs_iter_t *it,
     int32_t index)
 {
-    return ecs_term_source(it, index);
+    return ecs_term_subject(it, index);
 }
 
 ecs_id_t ecs_column_entity(

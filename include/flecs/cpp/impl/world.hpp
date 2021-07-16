@@ -16,6 +16,11 @@ inline flecs::id world::id() const {
     return flecs::id(m_world, _::cpp_type<T>::id(m_world));
 }
 
+template <typename ... Args>
+inline flecs::id world::id(Args&&... args) const {
+    return flecs::id(m_world, std::forward<Args>(args)...);
+}
+
 template <typename R, typename O>
 inline flecs::id world::pair() const {
     return flecs::id(

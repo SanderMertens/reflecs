@@ -24,12 +24,12 @@ void Iter(ecs_iter_t *it) {
     Velocity *v = NULL;
     Mass *m = NULL;
 
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         v = ecs_term(it, Velocity, 2);
         test_assert(!ecs_is_owned(it, 2));
     }
 
-    if (it->column_count >= 3) {
+    if (it->term_count >= 3) {
         m = ecs_term(it, Mass, 3);
         test_assert(!m || !ecs_is_owned(it, 3));
     }
@@ -64,7 +64,7 @@ void System_w_FromSystem_2_column_1_from_system() {
     test_int(v->y, 20);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_set(world, 0, Position, {0, 0});
 
@@ -118,7 +118,7 @@ void System_w_FromSystem_3_column_2_from_system() {
     test_int(*m, 3);
 
     Probe ctx = {0};
-    ecs_set_context(world, &ctx);
+    ecs_set_ctx(world, &ctx);
 
     ecs_entity_t e = ecs_set(world, 0, Position, {0, 0});
 
@@ -157,7 +157,7 @@ void Iter_reactive(ecs_iter_t *it) {
     Velocity *v = it->param;
     Mass *m = NULL;
 
-    if (it->column_count >= 2) {
+    if (it->term_count >= 2) {
         v = ecs_term(it, Velocity, 2);
         test_assert(!ecs_is_owned(it, 2));
     }

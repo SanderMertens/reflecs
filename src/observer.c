@@ -1,123 +1,43 @@
 #include "private_api.h"
 
 static
-void populate_columns(
-    ecs_world_t *world,
-    ecs_observer_t *o,
-    ecs_table_t *table,
-    ecs_data_t *data,
-    ecs_id_t *ids,
-    int32_t *columns,
-    ecs_type_t *types,
-    ecs_id_t event_id,
-    int32_t term_index)
-{
-    int32_t i, count = o->filter.term_count;
-
-    ids[0] = 0;
-    columns[0] = 0;
-    types[0] = NULL;
-
-    for (i = 0; i < count; i ++) {
-        ecs_type_t type = table->type;
-        ecs_term_t *t = &o->filter.terms[i];
-        int32_t index, ti = t->index;
-
-        ecs_id_t id = t->id;
-        if (t->args[0].entity != EcsThis) {
-            columns[ti] = 0;
-            ids[ti] = id;
-            types[ti] = ecs_type_from_id(world, id);
-            continue;
-        
-        } else if (i == term_index) {
-            /* If current term is the one that triggered the event, use its
-             * id to populate the iterator */
-            id = event_id;
-            index = ecs_type_match(type, 0, id);
-
-        } else {
-            index = ecs_type_match(type, 0, id);
-
-            /* If id was not found, this must be an Or/Not expression */
-            if (index == -1) {
-                if (t->oper == EcsNot) {
-                    ids[ti] = id;
-                    types[ti] = ecs_type_from_id(world, id);
-                    columns[ti] = 0;
-                } else {
-                    /* If id is not found and operator isn't Not, must be Or */
-                    ecs_assert(t->oper == EcsOr, ECS_INTERNAL_ERROR, NULL);
-                }
-
-                continue;
-            }
-        }
-
-        columns[ti] = index + 1;
-        types[ti] = ecs_type_from_id(world, id);
-
-        /* If id is wildcard, find a matching id in the table type */
-        if (ecs_id_is_wildcard(id)) {
-            ecs_assert(index < ecs_vector_count(type), 
-                ECS_INTERNAL_ERROR, NULL);
-
-            /* Get actual id from type */
-            id = ecs_vector_get(type, ecs_id_t, index)[0];
-        }
-
-        ids[ti] = id;
-
-        if (table->column_count <= index) {
-            /* If index is larger than column_count (the number of table columns
-             * that can contain data) set index to 0, so iter functions know
-             * no data is associated with term */
-            columns[ti] = 0;
-        } else {
-            ecs_column_t *column = &data->columns[index];
-            if (!column->size) {
-                /* If table column has o size, term has no data */
-                columns[ti] = 0;
-            }
-        }
-    } 
-}
-
-static
 void observer_callback(ecs_iter_t *it) {
     ecs_observer_t *o = it->ctx;
     ecs_world_t *world = it->world;
     
     ecs_assert(it->table != NULL, ECS_INTERNAL_ERROR, NULL);
-    ecs_assert(it->table->table != NULL, ECS_INTERNAL_ERROR, NULL);
 
-    ecs_table_t *table = it->table->table;
-    ecs_type_t type = table->type;
-    if (ecs_filter_match_type(world, &o->filter, type)) {
-        ecs_data_t *data = ecs_table_get_data(table);
-        ecs_id_t ids[ECS_FILTER_DESC_TERM_ARRAY_MAX];
-        int32_t columns[ECS_FILTER_DESC_TERM_ARRAY_MAX];
-        ecs_type_t types[ECS_FILTER_DESC_TERM_ARRAY_MAX];
-        ecs_iter_t user_it = *it;
+    ecs_type_t type = it->type;
+    ecs_iter_t user_it;
 
-        ecs_iter_table_t table_data = {
-            .table = table,
-            .columns = columns,
-            .components = ids,
-            .types = types
-        };
+    ecs_cached_type_t matched = {
+        .ids = user_it.private.ids_storage,
+        .subjects = user_it.private.subjects_storage,
+        .sizes = user_it.private.sizes_storage,
+        .type_map = user_it.private.type_map_storage
+    };
 
-        user_it.table = &table_data;
+    if (ecs_filter_populate_from_type(world, &o->filter, type, &matched, true)){
+        ecs_table_t *table = it->table;
+        void **columns = user_it.private.columns_storage;
 
-        populate_columns(world, o, table, data, ids, 
-            columns, types, it->event_id, it->term_index);
+        ecs_filter_populate_from_table(
+            world, &o->filter, table, &matched, columns);
 
+        ecs_iter_init_from(&user_it, it);
+
+        user_it.columns = columns;
+        user_it.type_map = matched.type_map;
+        user_it.ids = matched.ids;
+        user_it.subjects = matched.subjects;
+        user_it.sizes = matched.sizes;
         user_it.system = o->entity;
         user_it.term_index = it->term_index;
         user_it.self = o->self;
         user_it.ctx = o->ctx;
-        user_it.column_count = o->filter.term_count_actual,
-        user_it.table_columns = data->columns,
+        user_it.terms = o->filter.terms;
+        user_it.term_count = o->filter.term_count;
+
         o->action(&user_it);
     }
 }
