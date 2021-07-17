@@ -310,7 +310,9 @@ void ecs_os_set_api_defaults(void);
 
 #if defined(_MSC_VER)
 #define ecs_os_strcat(str1, str2) strcat_s(str1, INT_MAX, str2)
+#ifndef FLECS_LEGACY
 #define ecs_os_sprintf(ptr, ...) sprintf_s(ptr, INT_MAX, __VA_ARGS__)
+#endif
 #define ecs_os_vsprintf(ptr, fmt, args) vsprintf_s(ptr, INT_MAX, fmt, args)
 #define ecs_os_strcpy(str1, str2) strcpy_s(str1, INT_MAX, str2)
 #ifdef __cplusplus
@@ -320,7 +322,9 @@ void ecs_os_set_api_defaults(void);
 #endif
 #else
 #define ecs_os_strcat(str1, str2) strcat(str1, str2)
+#ifndef FLECS_LEGACY
 #define ecs_os_sprintf(ptr, ...) sprintf(ptr, __VA_ARGS__)
+#endif
 #define ecs_os_vsprintf(ptr, fmt, args) vsprintf(ptr, fmt, args)
 #define ecs_os_strcpy(str1, str2) strcpy(str1, str2)
 #ifdef __cplusplus
