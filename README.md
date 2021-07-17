@@ -168,6 +168,41 @@ The easiest way to add Flecs to a project is to add [flecs.c](https://raw.github
 ### Custom builds
 The Flecs source has a modular design which makes it easy to strip out code you don't need. At its core, Flecs is a minimalistic ECS library with a lot of optional features that you can choose to include or not. [This section of the manual](https://github.com/SanderMertens/flecs/blob/master/docs/Manual.md#custom-builds) describes how to customize which features to include. 
 
+### Conan Prebuilds
+If you are using CMake you can use the Conan package manager to include Flecs. Here is a sample on how to use Flecs with Conan:
+```cmake
+cmake_minimum_required(VERSION 3.5)
+
+project(ConanFlecsApp LANGUAGES C)
+
+# setup conan
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
+
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+  file(DOWNLOAD https://raw.githubusercontent.com/conan-io/cmake-conan/v0.16/conan.cmake
+    ${CMAKE_BINARY_DIR}/conan.cmake
+    TLS_VERIFY ON)
+endif()
+
+include(${CMAKE_BINARY_DIR}/conan.cmake)
+
+conan_cmake_configure(REQUIRES flecs/2.3.2 GENERATORS cmake_find_package)
+
+conan_cmake_autodetect(DETECTED_SETTINGS)
+conan_cmake_install(PATH_OR_REFERENCE .
+        REMOTE conan-center
+        SETTINGS ${DETECTED_SETTINGS})
+
+# use flecs
+
+find_package(flecs)
+
+add_executable(${PROJECT_NAME} main.c)
+target_link_libraries(${PROJECT_NAME} flecs::flecs_static)
+```
+
 ## Software Quality
 To ensure stability of Flecs, the code is thoroughly tested on every commit:
 
