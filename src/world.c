@@ -51,6 +51,8 @@ const ecs_entity_t EcsOnDemand = (ECS_HI_COMPONENT_ID + 40);
 const ecs_entity_t EcsMonitor = (ECS_HI_COMPONENT_ID + 41);
 const ecs_entity_t EcsDisabledIntern = (ECS_HI_COMPONENT_ID + 42);
 const ecs_entity_t EcsInactive = (ECS_HI_COMPONENT_ID + 43);
+const ecs_entity_t EcsDelayedActivation = (ECS_HI_COMPONENT_ID + 55);
+const ecs_entity_t EcsDelayedDeactivation = (ECS_HI_COMPONENT_ID + 56);
 
 /* Pipelines & builtin pipeline phases */
 const ecs_entity_t EcsPipeline = (ECS_HI_COMPONENT_ID + 44);

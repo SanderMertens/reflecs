@@ -1733,10 +1733,10 @@ void activate_table(
                 int32_t dst_count = ecs_vector_count(dst_array);
                 if (active) {
                     if (!prev_dst_count && dst_count) {
-                        ecs_system_activate(world, query->system, true, NULL);
+                        ecs_system_activate(world, query->system, true, true, NULL);
                     }
                 } else if (ecs_vector_count(src_array) == 0) {
-                    ecs_system_activate(world, query->system, false, NULL);
+                    ecs_system_activate(world, query->system, false, true, NULL);
                 }
             }
 #endif

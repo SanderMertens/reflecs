@@ -153,9 +153,21 @@ void ecs_system_activate(
     ecs_world_t *world,
     ecs_entity_t system,
     bool activate,
+    bool delayed,
     const EcsSystem *system_data)
 {
     ecs_assert(!world->is_readonly, ECS_INTERNAL_ERROR, NULL);
+    
+    if(delayed) {
+        if(activate) {
+          ecs_remove_id(world, system, EcsDelayedDeactivation);
+          ecs_add_id(world, system, EcsDelayedActivation);
+        } else {
+          ecs_remove_id(world, system, EcsDelayedActivation);
+          ecs_add_id(world, system, EcsDelayedDeactivation);
+        }
+        return;
+    }
 
     if (activate) {
         /* If activating system, ensure that it doesn't have the Inactive tag.
@@ -217,7 +229,7 @@ void ecs_enable_system(
 
     if (ecs_vector_count(query->tables)) {
         /* Only (de)activate system if it has non-empty tables. */
-        ecs_system_activate(world, system, enabled, system_data);
+        ecs_system_activate(world, system, enabled, false, system_data);
         system_data = ecs_get_mut(world, system, EcsSystem, NULL);
     }
 
@@ -579,7 +591,7 @@ void EnableSystem(
     ecs_iter_t *it)
 {
     EcsSystem *system_data = ecs_term(it, EcsSystem, 1);
-
+    
     int32_t i;
     for (i = 0; i < it->count; i ++) {
         ecs_enable_system(
@@ -645,7 +657,7 @@ ecs_entity_t ecs_system_init(
          * should activate the in terms, if any. This will ensure that any
          * OnDemand systems get enabled. */
         if (ecs_vector_count(query->tables)) {
-            ecs_system_activate(world, result, true, system);
+            ecs_system_activate(world, result, true, false, system);
         } else {
             /* If system isn't matched with any tables, mark it as inactive. This
              * causes it to be ignored by the main loop. When the system matches
@@ -769,6 +781,8 @@ void FlecsSystemImport(
     ecs_entity_t old_scope = ecs_set_scope(world, EcsFlecsCore);
     ecs_bootstrap_tag(world, EcsDisabledIntern);
     ecs_bootstrap_tag(world, EcsInactive);
+    ecs_bootstrap_tag(world, EcsDelayedActivation);
+    ecs_bootstrap_tag(world, EcsDelayedDeactivation);
     ecs_bootstrap_tag(world, EcsOnDemand);
     ecs_bootstrap_tag(world, EcsMonitor);
     ecs_set_scope(world, old_scope);

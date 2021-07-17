@@ -4,6 +4,9 @@
 
 #include "pipeline.h"
 
+ecs_query_t *DelayedActivation;
+ecs_query_t *DelayedDeactivation;
+
 /* Worker thread */
 static
 void* worker(void *arg) {
@@ -172,6 +175,110 @@ bool ecs_stop_threads(
 
 /* -- Private functions -- */
 
+static
+int compare_entity(
+    ecs_entity_t e1,
+    const void *ptr1,
+    ecs_entity_t e2,
+    const void *ptr2)
+{
+  (void)ptr1;
+  (void)ptr2;
+  return (e1 > e2) - (e1 < e2);
+}
+
+static
+ecs_query_t* build_delayed_activation_query(
+    ecs_world_t *world,
+    const char *name)
+{
+  int32_t term_count = 2;
+  
+  ecs_term_t *terms = ecs_os_malloc(
+      (term_count) * ECS_SIZEOF(ecs_term_t));
+  
+  terms[0] = (ecs_term_t){
+      .inout = EcsIn,
+      .oper = EcsAnd,
+      .pred.entity = ecs_id(EcsSystem),
+      .args[0] = {
+          .entity = EcsThis,
+          .set.mask = EcsSelf | EcsSuperSet
+      }
+  };
+  
+  terms[1] = (ecs_term_t){
+      .inout = EcsIn,
+      .oper = EcsAnd,
+      .pred.entity = EcsDelayedActivation,
+      .args[0] = {
+          .entity = EcsThis,
+          .set.mask = EcsSelf | EcsSuperSet
+      }
+  };
+  
+  ecs_query_t *result = ecs_query_init(world, &(ecs_query_desc_t){
+      .filter = {
+          .name = name,
+          .terms_buffer = terms,
+          .terms_buffer_count = term_count
+      },
+      .order_by = compare_entity,
+  });
+  
+  ecs_assert(result != NULL, ECS_INTERNAL_ERROR, NULL);
+  
+  ecs_os_free(terms);
+  
+  return result;
+}
+
+static
+ecs_query_t* build_delayed_deactivation_query(
+    ecs_world_t *world,
+    const char *name)
+{
+  int32_t term_count = 2;
+  
+  ecs_term_t *terms = ecs_os_malloc(
+      (term_count) * ECS_SIZEOF(ecs_term_t));
+  
+  terms[0] = (ecs_term_t){
+      .inout = EcsIn,
+      .oper = EcsAnd,
+      .pred.entity = ecs_id(EcsSystem),
+      .args[0] = {
+          .entity = EcsThis,
+          .set.mask = EcsSelf | EcsSuperSet
+      }
+  };
+  
+  terms[1] = (ecs_term_t){
+      .inout = EcsIn,
+      .oper = EcsAnd,
+      .pred.entity = EcsDelayedDeactivation,
+      .args[0] = {
+          .entity = EcsThis,
+          .set.mask = EcsSelf | EcsSuperSet
+      }
+  };
+  
+  ecs_query_t *result = ecs_query_init(world, &(ecs_query_desc_t){
+      .filter = {
+          .name = name,
+          .terms_buffer = terms,
+          .terms_buffer_count = term_count
+      },
+      .order_by = compare_entity,
+  });
+  
+  ecs_assert(result != NULL, ECS_INTERNAL_ERROR, NULL);
+  
+  ecs_os_free(terms);
+  
+  return result;
+}
+
 void ecs_worker_begin(
     ecs_world_t *world)
 {
@@ -240,6 +347,24 @@ void ecs_workers_progress(
         ecs_time_measure(&start);
     }
 
+    {
+      ecs_iter_t it = ecs_query_iter(DelayedActivation);
+      while (ecs_query_next(&it)) {
+        EcsSystem *sys = ecs_term(&it, EcsSystem, 1);
+        ecs_system_activate(world, sys->entity, true, false, NULL);
+        ecs_remove_id(world, sys->entity, EcsDelayedActivation);
+      }
+    }
+
+    {
+      ecs_iter_t it = ecs_query_iter(DelayedDeactivation);
+      while (ecs_query_next(&it)) {
+        EcsSystem *sys = ecs_term(&it, EcsSystem, 1);
+        ecs_system_activate(world, sys->entity, false, false, NULL);
+        ecs_remove_id(world, sys->entity, EcsDelayedDeactivation);
+      }
+    }
+
     if (stage_count == 1) {
         ecs_pipeline_update(world, pipeline, true);
         ecs_entity_t old_scope = ecs_set_scope(world, 0);
@@ -266,13 +391,6 @@ void ecs_workers_progress(
 
             /* Merge */
             ecs_staging_end(world);
-
-            int32_t update_count;
-            if ((update_count = ecs_pipeline_update(world, pipeline, false))) {
-                /* The number of operations in the pipeline could have changed
-                 * as result of the merge */
-                sync_count = update_count;
-            }
         }
     }
 
@@ -310,6 +428,9 @@ void ecs_set_threads(
             start_workers(world, threads);
         }
     }
+  
+  DelayedActivation = build_delayed_activation_query(world, "Delayed activation");
+  DelayedDeactivation = build_delayed_deactivation_query(world, "Delayed deactivation");
 }
 
 #endif

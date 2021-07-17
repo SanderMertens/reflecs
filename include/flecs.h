@@ -796,6 +796,8 @@ FLECS_API extern const ecs_entity_t EcsOnDemand;
 FLECS_API extern const ecs_entity_t EcsMonitor;
 FLECS_API extern const ecs_entity_t EcsDisabledIntern;
 FLECS_API extern const ecs_entity_t EcsInactive;
+FLECS_API extern const ecs_entity_t EcsDelayedActivation;
+FLECS_API extern const ecs_entity_t EcsDelayedDeactivation;
 
 /* Pipeline module tags */
 FLECS_API extern const ecs_entity_t EcsPipeline;

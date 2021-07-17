@@ -413,6 +413,7 @@ void ecs_pipeline_run(
     ecs_vector_t *ops = pq->ops;
     ecs_pipeline_op_t *op = ecs_vector_first(ops, ecs_pipeline_op_t);
     ecs_pipeline_op_t *op_last = ecs_vector_last(ops, ecs_pipeline_op_t);
+    int32_t count = ecs_vector_count(ops);
     int32_t ran_since_merge = 0;
 
     int32_t stage_index = ecs_get_stage_id(stage->thread_ctx);
@@ -484,7 +485,7 @@ ecs_query_t* build_pipeline_query(
     ecs_world_t *world,
     ecs_entity_t pipeline,
     const char *name,
-    bool with_inactive)
+    bool without_inactive)
 {
     const EcsType *type_ptr = ecs_get(world, pipeline, EcsType);
     ecs_assert(type_ptr != NULL, ECS_INTERNAL_ERROR, NULL);
@@ -492,7 +493,7 @@ ecs_query_t* build_pipeline_query(
     int32_t type_count = ecs_vector_count(type_ptr->normalized);
     int32_t term_count = 2;
 
-    if (with_inactive) {
+    if (without_inactive) {
         term_count ++;
     }
 
@@ -519,7 +520,7 @@ ecs_query_t* build_pipeline_query(
         }
     };
 
-    if (with_inactive) {
+    if (without_inactive) {
         terms[2] = (ecs_term_t){
             .inout = EcsIn,
             .oper = EcsNot,

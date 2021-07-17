@@ -32,6 +32,7 @@ void ecs_system_activate(
     ecs_world_t *world,
     ecs_entity_t system,
     bool activate,
+    bool delayed,
     const EcsSystem *system_data);
 
 /* Internal function to run a system */
