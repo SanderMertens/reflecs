@@ -18,6 +18,9 @@ typedef struct ecs_storage_t ecs_storage_t;
 
 typedef struct ecs_storage_iter_t {
     void *data;
+    ecs_size_t size;
+    ecs_size_t alignment;
+    int32_t offset;
     int32_t count;
 } ecs_storage_iter_t;
 
@@ -69,12 +72,13 @@ typedef void* (*ecs_storage_count_action_t)(
     ecs_storage_t *storage);   
 
 typedef ecs_storage_iter_t (*ecs_storage_iter_action_t)(
-    ecs_storage_t *storage);
+    const ecs_storage_t *storage,
+    ecs_size_t size,
+    ecs_size_t alignment);
 
 typedef bool (*ecs_storage_next_action_t)(
-    ecs_storage_t *storage,
-    ecs_storage_iter_t *iter,
-    int32_t offset);
+    const ecs_storage_t *storage,
+    ecs_storage_iter_t *iter);
 
 typedef struct ecs_storage_plugin_t {
     ecs_storage_init_action_t init;

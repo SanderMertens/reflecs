@@ -58,6 +58,15 @@ bool ecs_bitset_storage_has(
     int32_t index,
     uint64_t id);
 
+ecs_storage_iter_t ecs_bitset_storage_iter(
+    const ecs_storage_t *storage,
+    ecs_size_t size,
+    ecs_size_t alignment);
+
+bool ecs_bitset_storage_next(
+    const ecs_storage_t *storage,
+    ecs_storage_iter_t *iter);
+
 ecs_storage_plugin_t ecs_bitset_storage_plugin(void);
 
 #ifdef __cplusplus
